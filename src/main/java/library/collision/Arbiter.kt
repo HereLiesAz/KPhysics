@@ -1,7 +1,7 @@
 package library.collision
 
 import library.dynamics.Body
-import library.dynamics.Settings
+import library.dynamics.Physics
 import library.geometry.Circle
 import library.geometry.Polygon
 import library.math.Vec2
@@ -259,7 +259,7 @@ class Arbiter(
         //Discards points that are positive/above the reference face
         for (i in 0..1) {
             val separation = refFaceNormal.dot(incidentFaceVertexes[i]) - refFaceNormal.dot(v1)
-            if (separation <= 0.0 + Settings.EPSILON) {
+            if (separation <= 0.0 + Physics.EPSILON) {
                 contactVectorsFound[contactsFound] = incidentFaceVertexes[i]
                 totalPen += -separation
                 contactsFound++
@@ -361,12 +361,12 @@ class Arbiter(
      * Based on linear projection to move the shapes away from each other based on a correction constant and scaled relative to the inverse mass of the objects.
      */
     fun penetrationResolution() {
-        val penetrationTolerance = penetration - Settings.PENETRATION_ALLOWANCE
+        val penetrationTolerance = penetration - Physics.PENETRATION_ALLOWANCE
         if (penetrationTolerance <= 0.0) {
             return
         }
         val totalMass = a.mass + b.mass
-        val correction = penetrationTolerance * Settings.PENETRATION_CORRECTION / totalMass
+        val correction = penetrationTolerance * Physics.PENETRATION_CORRECTION / totalMass
         a.position = a.position.plus(contactNormal.scalar(-a.mass * correction))
         b.position = b.position.plus(contactNormal.scalar(b.mass * correction))
     }
@@ -441,7 +441,7 @@ class Arbiter(
          * @return boolean value whether a is to be preferred or not.
          */
         private fun selectionBias(a: Double, b: Double): Boolean {
-            return a >= b * Settings.BIAS_RELATIVE + a * Settings.BIAS_ABSOLUTE
+            return a >= b * Physics.BIAS_RELATIVE + a * Physics.BIAS_ABSOLUTE
         }
     }
 }

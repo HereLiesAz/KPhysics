@@ -1,8 +1,7 @@
 package demo.window;
 
-import demo.utils.ColourSettings;
 import demo.tests.*;
-import library.dynamics.Settings;
+import demo.utils.ColourSettings;
 
 import java.awt.*;
 
@@ -43,7 +42,7 @@ public class DemoText {
         g.drawString("Right click: moves the camera position", 5, y);
         g.drawString("Space: pauses demo", 5, y += 20);
         g.drawString("R: restart current demo", 5, y += 20);
-        g.drawString("Hertz: " + Settings.HERTZ, 5, y += 20);
+        g.drawString("Hertz: " + TestBedWindow.HERTZ, 5, y += 20);
         if (LineOfSight.active) {
             LineOfSight.drawInfo(g, 5, y + 20);
         }

@@ -1,9 +1,8 @@
 package demo.input;
 
-import demo.window.Camera;
 import demo.tests.*;
+import demo.window.Camera;
 import demo.window.TestBedWindow;
-import library.dynamics.Settings;
 import library.explosions.ParticleExplosion;
 import library.explosions.ProximityExplosion;
 import library.math.Vec2;
@@ -57,7 +56,7 @@ public abstract class TestbedControls {
             }
             case "Slice objects" -> {
                 SliceObjects.load(TESTBED);
-                Settings.HERTZ = 120;
+                TestBedWindow.HERTZ = 120;
                 TESTBED.setCurrentDemo(7);
             }
             case "Bouncing ball" -> {
@@ -108,7 +107,7 @@ public abstract class TestbedControls {
         SliceObjects.active = false;
         LineOfSight.active = false;
         Trebuchet.active = false;
-        Settings.HERTZ = 60;
+        TestBedWindow.HERTZ = 60;
     }
 
     protected void setProximityEpicentre(MouseEvent e) {

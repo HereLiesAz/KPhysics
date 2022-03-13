@@ -1,29 +1,30 @@
-package demo.tests;
+package demo.tests
 
-import demo.window.TestBedWindow;
-import library.dynamics.World;
-import library.math.Vec2;
-import library.rays.ShadowCasting;
+import demo.window.TestBedWindow
+import library.dynamics.World
+import library.math.Vec2
+import library.rays.ShadowCasting
+import java.awt.Graphics2D
 
-import java.awt.*;
-
-public class LineOfSight {
-    public static final String[] text = {"Line of sight:", "Mouse: Move mouse to change position of raycast"};
-    public static boolean active = false;
-    public static ShadowCasting b;
-
-    public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
-        testBedWindow.setCamera(new Vec2(-120, 20), 3.3);
-        active = true;
-
-        testBedWindow.generateBoxOfObjects();
-
-        b = new ShadowCasting(new Vec2(-1000, 0), 11000);
-        testBedWindow.add(b);
+object LineOfSight {
+    @JvmField
+    val text = arrayOf("Line of sight:", "Mouse: Move mouse to change position of raycast")
+    @JvmField
+    var active = false
+    @JvmField
+    var b: ShadowCasting? = null
+    @JvmStatic
+    fun load(testBedWindow: TestBedWindow) {
+        testBedWindow.world = World(Vec2(.0, -9.81))
+        testBedWindow.setCamera(Vec2(-120.0, 20.0), 3.3)
+        active = true
+        testBedWindow.generateBoxOfObjects()
+        b = ShadowCasting(Vec2(-1000.0, .0), 11000)
+        testBedWindow.add(b)
     }
 
-    public static void drawInfo(Graphics2D g, int x, int y) {
-        g.drawString("No of rays: " + b.getNoOfRays(), x, y);
+    @JvmStatic
+    fun drawInfo(g: Graphics2D, x: Int, y: Int) {
+        g.drawString("No of rays: " + b!!.noOfRays, x, y)
     }
 }

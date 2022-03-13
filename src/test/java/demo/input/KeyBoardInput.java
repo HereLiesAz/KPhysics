@@ -1,9 +1,8 @@
 package demo.input;
 
-import demo.utils.ColourSettings;
 import demo.tests.Trebuchet;
+import demo.utils.ColourSettings;
 import demo.window.TestBedWindow;
-import library.dynamics.Settings;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +30,7 @@ public class KeyBoardInput extends TestbedControls implements KeyListener, Actio
         } else if (e.getKeyCode() == KeyEvent.VK_B) {
             if (TESTBED.getWorld().joints.size() == 3 && Trebuchet.active) {
                 TESTBED.getWorld().joints.remove(2);
-                Settings.HERTZ = 60;
+                TestBedWindow.HERTZ = 60;
             }
         } else if (e.getKeyCode() == KeyEvent.VK_R) {
             loadDemo(currentDemo);

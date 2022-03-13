@@ -133,7 +133,7 @@ class World(var gravity: Vec2 = Vec2()) {
         }
 
         //Resolve collisions
-        for (i in 0 until Settings.ITERATIONS) {
+        for (i in 0 until Physics.ITERATIONS) {
             for (contact in contacts) {
                 contact.solve()
             }

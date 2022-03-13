@@ -1,14 +1,13 @@
 package demo.window;
 
-import demo.utils.ColourSettings;
-import demo.utils.Painter;
-import demo.utils.Trail;
 import demo.input.*;
 import demo.tests.Chains;
 import demo.tests.Raycast;
+import demo.utils.ColourSettings;
+import demo.utils.Painter;
+import demo.utils.Trail;
 import library.collision.AxisAlignedBoundingBox;
 import library.dynamics.Body;
-import library.dynamics.Settings;
 import library.dynamics.World;
 import library.explosions.Explosion;
 import library.explosions.ParticleExplosion;
@@ -31,9 +30,11 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class TestBedWindow extends JPanel implements Runnable {
     private final Camera CAMERA;
+    public static double HERTZ = 60;
 
     public void setCamera(Vec2 centre, double zoom) {
         CAMERA.setCentre(centre);
@@ -209,7 +210,7 @@ public class TestBedWindow extends JPanel implements Runnable {
     }
 
     private void update() {
-        double dt = Settings.HERTZ > 0.0 ? 1.0 / Settings.HERTZ : 0.0;
+        double dt = TestBedWindow.HERTZ > 0.0 ? 1.0 / TestBedWindow.HERTZ : 0.0;
         world.step(dt);
         updateTrails();
         updateRays();
@@ -438,10 +439,10 @@ public class TestBedWindow extends JPanel implements Runnable {
             hertzMenu.add(hertzMenuItem);
             hertzMenuItem.addActionListener(e -> {
                 switch (e.getActionCommand()) {
-                    case "30" -> Settings.HERTZ = 30;
-                    case "60" -> Settings.HERTZ = 60;
-                    case "90" -> Settings.HERTZ = 90;
-                    case "120" -> Settings.HERTZ = 120;
+                    case "30" -> TestBedWindow.HERTZ = 30;
+                    case "60" -> TestBedWindow.HERTZ = 60;
+                    case "90" -> TestBedWindow.HERTZ = 90;
+                    case "120" -> TestBedWindow.HERTZ = 120;
                 }
             });
         }
@@ -605,19 +606,19 @@ public class TestBedWindow extends JPanel implements Runnable {
     }
 
     private Body createRandomObject(Vec2 lowerBound, Vec2 upperBound, int maxRadius) {
-        int objectType = Settings.random(1, 2);
+        int objectType = random(1, 2);
         Body b = null;
-        int radius = Settings.random(5, maxRadius);
-        double x = Settings.random((int) (lowerBound.getX() + radius), (int) (upperBound.getX() - radius));
-        double y = Settings.random((int) (lowerBound.getY() + radius), (int) (upperBound.getY() - radius));
-        double rotation = Settings.random(0, (int) 7.0);
+        int radius = random(5, maxRadius);
+        double x = random((int) (lowerBound.getX() + radius), (int) (upperBound.getX() - radius));
+        double y = random((int) (lowerBound.getY() + radius), (int) (upperBound.getY() - radius));
+        double rotation = random(0, (int) 7.0);
         switch (objectType) {
             case 1 -> {
                 b = new Body(new Circle(radius), x, y);
                 b.setOrientation(rotation);
             }
             case 2 -> {
-                int sides = Settings.random(3, 10);
+                int sides = random(3, 10);
                 b = new Body(new Polygon(radius, sides), x, y);
                 b.setOrientation(rotation);
             }
@@ -751,5 +752,16 @@ public class TestBedWindow extends JPanel implements Runnable {
             b.setStaticFriction(b.getStaticFriction() * ratio);
             b.setDynamicFriction(b.getDynamicFriction() * ratio);
         }
+    }
+
+    /**
+     * Generates a random number within the desired range.
+     * @param min Minimum int value that the range can fall inside
+     * @param max Maximum int value that the range can fall inside
+     * @return int value inside the range of min and max supplied
+     */
+    private int random(int min, int max) {
+        Random rand = new Random();
+        return rand.nextInt(max - min + 1) + min;
     }
 }
