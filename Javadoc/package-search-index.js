@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"library.collision"},{"l":"library.dynamics"},{"l":"library.explosions"},{"l":"library.geometry"},{"l":"library.joints"},{"l":"library.math"},{"l":"library.rays"}]

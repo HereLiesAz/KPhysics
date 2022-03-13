@@ -1,7 +1,0 @@
-library.collision
-library.dynamics
-library.explosions
-library.geometry
-library.joints
-library.math
-library.rays
