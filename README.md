@@ -3,7 +3,14 @@ KPhysics is an improved and extended version of Hayden Marshalla's JPhysics. It 
 
 It is written in Kotlin and is intended to be easily used in games programmed with Kotlin or Java.
 
-## Tech demos
+##Summary
+* [Tech Demos](#tech-demos)
+* [Feature List](#feature-list)
+* [Using KPhysics](#using-kphysics)
+* [Documentation](#documentation)
+* [Credits](#credits)
+
+## Tech Demos
 
 A tech demo can be found [here](https://github.com/Chafficui/KPhysics/tree/master/src/test/java/demo) and includes various examples to show what the engine is capable of.
 To run the demos yourself simply clone the project and run the Main.java file.
@@ -117,14 +124,6 @@ KPhysics is very feature rich. For example, there is RayTracing, particle physic
 
 ## Documentation
 Coming soon!
-
-## Authors
- - Chafficui
-
- (based on a JPhysics by HaydenMarshalla)
-
-## License
-[License](https://github.com/Chafficui/KPhysics/blob/master/LICENSE)
 
 ## Credits
 Everything in this project is based on the [JPhysics](https://github.com/HaydenMarshalla/JPhysics).
