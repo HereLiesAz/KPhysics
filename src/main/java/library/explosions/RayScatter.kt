@@ -1,11 +1,11 @@
 package library.explosions
 
+import demo.Camera
+import demo.ColourSettings
 import library.dynamics.Body
 import library.math.Mat2
 import library.math.Vec2
 import library.rays.Ray
-import testbed.Camera
-import testbed.ColourSettings
 import java.awt.Graphics2D
 
 /**

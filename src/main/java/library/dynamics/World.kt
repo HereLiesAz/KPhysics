@@ -1,11 +1,11 @@
 package library.dynamics
 
-import library.collision.AxisAlignedBoundingBox
+import demo.Camera
+import demo.ColourSettings
 import library.collision.Arbiter
+import library.collision.AxisAlignedBoundingBox
 import library.joints.Joint
 import library.math.Vec2
-import testbed.Camera
-import testbed.ColourSettings
 import java.awt.Graphics2D
 import java.awt.geom.Line2D
 import kotlin.math.pow

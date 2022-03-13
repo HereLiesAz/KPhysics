@@ -1,6 +1,5 @@
-package testbed.junittests;
+package library.collision;
 
-import library.collision.AxisAlignedBoundingBox;
 import library.dynamics.Body;
 import library.geometry.Circle;
 import library.math.Vec2;

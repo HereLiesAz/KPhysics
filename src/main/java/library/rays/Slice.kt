@@ -1,12 +1,12 @@
 package library.rays
 
+import demo.Camera
+import demo.ColourSettings
 import library.dynamics.Body
 import library.dynamics.World
 import library.geometry.Circle
 import library.geometry.Polygon
 import library.math.Vec2
-import testbed.Camera
-import testbed.ColourSettings
 import java.awt.Graphics2D
 import java.awt.geom.Line2D
 import kotlin.math.sqrt

@@ -1,0 +1,33 @@
+package demo.tests;
+
+import demo.window.TestBedWindow;
+import library.dynamics.Body;
+import library.dynamics.World;
+import library.geometry.Polygon;
+import library.math.Vec2;
+
+public class Friction {
+    public static final String[] text = {"Friction:"};
+
+    public static void load(TestBedWindow testBedWindow) {
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
+        World world = testBedWindow.getWorld();
+        testBedWindow.setCamera(new Vec2(0, 0), 1.4);
+
+        {
+            for (int i = 0; i < 3; i++) {
+                Body ramp = world.addBody(new Body(new Polygon(200.0, 10.0), -200 + (200 * i), 200 - (180 * i)));
+                ramp.setOrientation(-0.2);
+                ramp.setDensity(0);
+            }
+
+            for (int i = 0; i < 3; i++) {
+                Body box = world.addBody(new Body(new Polygon(20.0, 20.0), -290 + (200 * i), 250 - (180 * i)));
+                box.setOrientation(-0.2);
+                box.setStaticFriction(0.5 - (i * 0.1));
+                box.setDynamicFriction(0.3 - (i * 0.1));
+                box.setDensity(1);
+            }
+        }
+    }
+}

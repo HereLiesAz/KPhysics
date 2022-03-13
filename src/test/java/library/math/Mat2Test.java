@@ -1,7 +1,5 @@
-package testbed.junittests;
+package library.math;
 
-import library.math.Mat2;
-import library.math.Vec2;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;

@@ -1,9 +1,9 @@
 package library.geometry
 
+import demo.Camera
+import demo.ColourSettings
 import library.collision.AxisAlignedBoundingBox
 import library.math.Vec2
-import testbed.Camera
-import testbed.ColourSettings
 import java.awt.Graphics2D
 import java.awt.geom.Ellipse2D
 
