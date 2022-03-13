@@ -5,7 +5,8 @@ It is written in Kotlin and is intended to be easily used in games programmed wi
 
 ## Tech demos
 
-A tech demo can be found [here]() and includes various examples to show what the engine is capable of.
+A tech demo can be found [here](https://github.com/Chafficui/KPhysics/tree/master/src/test/java/demo) and includes various examples to show what the engine is capable of.
+To run the demos yourself simply clone the project and run the Main.java file.
 ![Chains Demo](https://i.postimg.cc/50Ggn2qL/Chains.png "Chains")
 ![Particle Demo](https://i.postimg.cc/ZKgmp8d5/Particle-explosion-demo.png "Particles")
 ![Shadow Demo](https://i.postimg.cc/13qQH8Gc/Shadow-casting.png "Shadows")
