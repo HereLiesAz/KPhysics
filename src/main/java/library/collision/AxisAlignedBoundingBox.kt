@@ -20,7 +20,7 @@ class AxisAlignedBoundingBox(min: Vec2 = Vec2(), max: Vec2 = Vec2()) {
     /**
      * Lower left vertex of bounding box.
      */
-    var min: Vec2 = min
+    var min: Vec2 = min.copy()
         private set
     /**
      * Getter for max variable for upper bound vertex.
@@ -30,7 +30,7 @@ class AxisAlignedBoundingBox(min: Vec2 = Vec2(), max: Vec2 = Vec2()) {
     /**
      * Top right vertex of bounding box.
      */
-    var max: Vec2 = max
+    var max: Vec2 = max.copy()
         private set
 
     /**
