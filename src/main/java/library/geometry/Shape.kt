@@ -2,6 +2,7 @@ package library.geometry
 
 import library.dynamics.Body
 import library.math.Mat2
+import library.math.Vec2
 
 /**
  * Abstract class presenting a geometric shape.
@@ -21,4 +22,6 @@ abstract class Shape internal constructor() {
      * Generates an AABB for the shape.
      */
     abstract fun createAABB()
+
+    abstract fun isPointInside(startPoint: Vec2): Boolean
 }
