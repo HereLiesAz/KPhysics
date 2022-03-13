@@ -180,4 +180,27 @@ class Polygon : Shape {
         val value = (p2.y - p1.y) * (point.x - p2.x) - (p2.x - p1.x) * (point.y - p2.y)
         return if (value > 0) 1 else if (value == 0.0) 0 else -1
     }
+
+    /**
+     * Method to check if point is inside a body in world space.
+     *
+     * @param startPoint Vector point to check if its inside the first body.
+     * @return boolean value whether the point is inside the first body.
+     */
+    override fun isPointInside(startPoint: Vec2): Boolean {
+        for (i in vertices.indices) {
+            val objectPoint = startPoint.minus(
+                body.position.plus(
+                    body.shape.orientation.mul(
+                        vertices[i],
+                        Vec2()
+                    )
+                )
+            )
+            if (objectPoint.dot(body.shape.orientation.mul(normals[i], Vec2())) > 0) {
+                return false
+            }
+        }
+        return true
+    }
 }

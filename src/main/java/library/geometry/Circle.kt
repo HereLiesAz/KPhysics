@@ -30,4 +30,15 @@ class Circle
     override fun createAABB() {
         body.aabb = AxisAlignedBoundingBox(Vec2(-radius, -radius), Vec2(radius, radius))
     }
+
+    /**
+     * Method to check if point is inside a body in world space.
+     *
+     * @param startPoint Vector point to check if its inside the first body.
+     * @return boolean value whether the point is inside the first body.
+     */
+    override fun isPointInside(startPoint: Vec2): Boolean {
+        val d = body.position.minus(startPoint)
+        return d.length() <= radius
+    }
 }
