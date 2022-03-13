@@ -30,6 +30,7 @@ public class DemoText {
             case 13 -> drawArray(Drag.text, g);
             case 14 -> drawArray(Restitution.text, g);
             case 15 -> drawArray(StackedObjects.text, g);
+            case 16 -> drawArray(BouncyBall.text, g);
         }
     }
 

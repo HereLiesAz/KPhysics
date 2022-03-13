@@ -92,6 +92,10 @@ public abstract class TestbedControls {
                 StackedObjects.load(TESTBED);
                 TESTBED.setCurrentDemo(15);
             }
+            case "Bouncy Ball" -> {
+                BouncyBall.load(TESTBED);
+                TESTBED.setCurrentDemo(16);
+            }
         }
     }
 

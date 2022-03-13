@@ -550,6 +550,11 @@ public class TestBedWindow extends JPanel implements Runnable {
         testMenu.add(stackedObjects);
         stackedObjects.addActionListener(new KeyBoardInput(gameScreen));
 
+        JMenuItem bouncyBall = new JMenuItem("Bouncy Ball");
+        bouncyBall.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK));
+        testMenu.add(bouncyBall);
+        bouncyBall.addActionListener(new KeyBoardInput(gameScreen));
+
         return testMenu;
     }
 
