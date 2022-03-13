@@ -429,27 +429,7 @@ class Arbiter(
          */
         @JvmStatic
         fun isPointInside(b: Body, startPoint: Vec2): Boolean {
-            if (b.shape is Polygon) {
-                val poly = b.shape as Polygon
-                for (i in poly.vertices.indices) {
-                    val objectPoint = startPoint.minus(
-                        poly.body.position.plus(
-                            poly.body.shape.orientation.mul(
-                                poly.vertices[i],
-                                Vec2()
-                            )
-                        )
-                    )
-                    if (objectPoint.dot(poly.body.shape.orientation.mul(poly.normals[i], Vec2())) > 0) {
-                        return false
-                    }
-                }
-            } else if (b.shape is Circle) {
-                val circle = b.shape as Circle
-                val d = b.position.minus(startPoint)
-                return d.length() <= circle.radius
-            }
-            return true
+            return b.shape.isPointInside(startPoint)
         }
 
         /**
