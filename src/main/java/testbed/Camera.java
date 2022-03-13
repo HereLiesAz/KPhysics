@@ -1,6 +1,6 @@
 package testbed;
 
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class Camera {
@@ -8,21 +8,21 @@ public class Camera {
     public double zoom;
     public int width;
     public int height;
-    public Vectors2D centre;
-    private TestBedWindow panel;
+    public Vec2 centre;
+    private final TestBedWindow panel;
 
-    protected Vectors2D pointClicked;
+    protected Vec2 pointClicked;
 
-    public Vectors2D getPointClicked(){
+    public Vec2 getPointClicked(){
         return pointClicked;
     }
 
-    public void setPointClicked(Vectors2D v){
+    public void setPointClicked(Vec2 v){
         pointClicked = v;
     }
 
     public Camera(int windowWidth, int windowHeight, TestBedWindow testWindow) {
-        centre = new Vectors2D(0, 0);
+        centre = new Vec2(0, 0);
         zoom = 1.0;
         this.width = windowWidth;
         this.height = windowHeight;
@@ -30,23 +30,23 @@ public class Camera {
         aspectRatio = width * 1.0 / height;
     }
 
-    Vectors2D upperBound = new Vectors2D();
-    Vectors2D lowerBound = new Vectors2D();
+    Vec2 upperBound = new Vec2();
+    Vec2 lowerBound = new Vec2();
 
-    public Vectors2D convertToScreen(Vectors2D v) {
+    public Vec2 convertToScreen(Vec2 v) {
         updateViewSize(aspectRatio);
         double boxWidth = (v.getX() - lowerBound.getX()) / (upperBound.getX() - lowerBound.getX());
         double boxHeight = (v.getY() - lowerBound.getY()) / (upperBound.getY() - lowerBound.getY());
 
-        Vectors2D output = new Vectors2D();
+        Vec2 output = new Vec2();
         output.setX(boxWidth * panel.getWidth());
         output.setY((1.0 - boxHeight) * (panel.getWidth() / aspectRatio));
         return output;
     }
 
-    public Vectors2D convertToWorld(Vectors2D vec) {
+    public Vec2 convertToWorld(Vec2 vec) {
         updateViewSize(aspectRatio);
-        Vectors2D output = new Vectors2D();
+        Vec2 output = new Vec2();
         double distAlongWindowXAxis = vec.getX() / panel.getWidth();
         output.setX((1.0 - distAlongWindowXAxis) * lowerBound.getX() + distAlongWindowXAxis * upperBound.getX());
 
@@ -57,27 +57,27 @@ public class Camera {
     }
 
     private void updateViewSize(double aspectRatio) {
-        Vectors2D extents = new Vectors2D(aspectRatio * 200, 200);
+        Vec2 extents = new Vec2(aspectRatio * 200, 200);
         extents = extents.scalar(zoom);
-        upperBound = centre.addi(extents);
-        lowerBound = centre.subtract(extents);
+        upperBound = centre.plus(extents);
+        lowerBound = centre.minus(extents);
     }
 
     public double scaleToScreenXValue(double radius) {
         double aspectRatio = width * 1.0 / height;
-        Vectors2D extents = new Vectors2D(aspectRatio * 200, 200);
+        Vec2 extents = new Vec2(aspectRatio * 200, 200);
         extents = extents.scalar(zoom);
-        Vectors2D upperBound = centre.addi(extents);
-        Vectors2D lowerBound = centre.subtract(extents);
+        Vec2 upperBound = centre.plus(extents);
+        Vec2 lowerBound = centre.minus(extents);
         double w = radius / (upperBound.getX() - lowerBound.getX());
         return w * panel.getWidth();
     }
 
-    public void transformCentre(Vectors2D v) {
+    public void transformCentre(Vec2 v) {
         centre.add(v);
     }
 
-    public void setCentre(Vectors2D centre) {
+    public void setCentre(Vec2 centre) {
         this.centre = centre;
     }
 
@@ -87,7 +87,7 @@ public class Camera {
     }
 
     public void reset() {
-        setCentre(new Vectors2D());
+        setCentre(new Vec2());
         setZoom(1.0);
     }
 }

@@ -1,7 +1,7 @@
 package library.explosions
 
 import library.dynamics.Body
-import library.math.Vectors2D
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -38,5 +38,5 @@ interface Explosion {
      *
      * @param v The vector position of the new epicentre.
      */
-    fun setEpicentre(v: Vectors2D)
+    fun setEpicentre(v: Vec2)
 }

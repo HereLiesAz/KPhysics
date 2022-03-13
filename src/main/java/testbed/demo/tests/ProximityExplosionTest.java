@@ -2,7 +2,7 @@ package testbed.demo.tests;
 
 import library.explosions.ProximityExplosion;
 import library.dynamics.World;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class ProximityExplosionTest {
@@ -12,12 +12,12 @@ public class ProximityExplosionTest {
 
     public static void load(TestBedWindow testBedWindow) {
         active = true;
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
-        testBedWindow.setCamera(new Vectors2D(0, 300), 2.0);
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
+        testBedWindow.setCamera(new Vec2(0, 300), 2.0);
 
         testBedWindow.buildExplosionDemo();
 
-        p = new ProximityExplosion(new Vectors2D(), 200);
+        p = new ProximityExplosion(new Vec2(), 200);
         testBedWindow.add(p);
 
     }

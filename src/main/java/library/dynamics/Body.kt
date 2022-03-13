@@ -1,49 +1,46 @@
 package library.dynamics
 
-import library.collision.AABB
-import library.geometry.Shapes
-import library.math.Vectors2D
+import library.collision.AxisAlignedBoundingBox
+import library.geometry.Shape
+import library.math.Vec2
 
 /**
  * Class to create a body to add to a world.
+ *
+ * @param shape Shape to bind to body.
+ * @param x     Position x in world space.
+ * @param y     Position y in world space.
  */
-class Body(var shape: Shapes, x: Double, y: Double) {
+class Body(var shape: Shape, x: Double, y: Double) {
     var dynamicFriction: Double
     var staticFriction: Double
-    var position: Vectors2D
-    var velocity: Vectors2D
-    var force: Vectors2D
+    var position: Vec2
+    var velocity: Vec2
+    var force: Vec2
     var angularVelocity: Double
     var torque: Double
     var restitution: Double
     var mass = 0.0
     var invMass = 0.0
-    var I = 0.0
-    var invI = 0.0
+    var inertia = 0.0
+    var invInertia = 0.0
     var orientation: Double = 0.0
         set(value) {
             field = value
-            shape.orient.set(orientation)
+            shape.orientation.set(orientation)
             shape.createAABB()
         }
-    lateinit var aabb: AABB
+    lateinit var aabb: AxisAlignedBoundingBox
     var linearDampening: Double
-    var angularDampening: Double
+    private var angularDampening: Double
     var affectedByGravity: Boolean
     var particle: Boolean
 
-    /**
-     * Constructor for body.
-     *
-     * @param shape Shape to bind to body.
-     * @param x     Position x in world space.
-     * @param y     Position y in world space.
-     */
     init {
         shape.body = this
-        position = Vectors2D(x, y)
-        velocity = Vectors2D(.0, .0)
-        force = Vectors2D(.0, .0)
+        position = Vec2(x, y)
+        velocity = Vec2(.0, .0)
+        force = Vec2(.0, .0)
         angularVelocity = 0.0
         torque = 0.0
         restitution = 0.8
@@ -52,7 +49,7 @@ class Body(var shape: Shapes, x: Double, y: Double) {
         linearDampening = 0.0
         angularDampening = 0.0
         orientation = 0.0
-        shape.orient.set(orientation)
+        shape.orientation.set(orientation)
         shape.calcMass(1.0)
         shape.createAABB()
         particle = false
@@ -65,9 +62,9 @@ class Body(var shape: Shapes, x: Double, y: Double) {
      * @param force        Force vector to apply.
      * @param contactPoint The point to apply the force to relative to the body in object space.
      */
-    fun applyForce(force: Vectors2D?, contactPoint: Vectors2D) {
+    fun applyForce(force: Vec2, contactPoint: Vec2) {
         this.force.add(force)
-        torque += contactPoint.crossProduct(force)
+        torque += contactPoint.cross(force)
     }
 
     /**
@@ -75,7 +72,7 @@ class Body(var shape: Shapes, x: Double, y: Double) {
      *
      * @param force Force vector to apply.
      */
-    fun applyForceToCentre(force: Vectors2D?) {
+    fun applyForce(force: Vec2) {
         this.force.add(force)
     }
 
@@ -85,9 +82,9 @@ class Body(var shape: Shapes, x: Double, y: Double) {
      * @param impulse      Magnitude of impulse vector.
      * @param contactPoint The point to apply the force to relative to the body in object space.
      */
-    fun applyLinearImpulse(impulse: Vectors2D?, contactPoint: Vectors2D?) {
-        velocity.add(impulse!!.scalar(invMass))
-        angularVelocity += invI * contactPoint!!.crossProduct(impulse)
+    fun applyLinearImpulse(impulse: Vec2, contactPoint: Vec2) {
+        velocity.add(impulse.scalar(invMass))
+        angularVelocity += invInertia * contactPoint.cross(impulse)
     }
 
     /**
@@ -95,8 +92,8 @@ class Body(var shape: Shapes, x: Double, y: Double) {
      *
      * @param impulse Magnitude of impulse vector.
      */
-    fun applyLinearImpulseToCentre(impulse: Vectors2D?) {
-        velocity.add(impulse!!.scalar(invMass))
+    fun applyLinearImpulse(impulse: Vec2) {
+        velocity.add(impulse.scalar(invMass))
     }
 
     /**
@@ -118,7 +115,7 @@ class Body(var shape: Shapes, x: Double, y: Double) {
     private fun setStatic() {
         mass = 0.0
         invMass = 0.0
-        I = 0.0
-        invI = 0.0
+        inertia = 0.0
+        invInertia = 0.0
     }
 }

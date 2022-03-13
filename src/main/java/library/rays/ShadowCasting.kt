@@ -4,8 +4,8 @@ import library.collision.Arbiter.Companion.isPointInside
 import library.dynamics.Body
 import library.geometry.Circle
 import library.geometry.Polygon
-import library.math.Matrix2D
-import library.math.Vectors2D
+import library.math.Mat2
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -22,13 +22,13 @@ class ShadowCasting
  *
  * @param startPoint Origin of projecting rays.
  * @param distance   The desired distance to project the rays.
- */(private var startPoint: Vectors2D, private val distance: Int) {
+ */(private var startPoint: Vec2, private val distance: Int) {
     /**
      * Setter for start point.
      *
      * @param startPoint Returns start point.
      */
-    fun setStartPoint(startPoint: Vectors2D) {
+    fun setStartPoint(startPoint: Vec2) {
         this.startPoint = startPoint
     }
 
@@ -49,21 +49,21 @@ class ShadowCasting
             if (B.shape is Polygon) {
                 val poly1 = B.shape as Polygon
                 for (v in poly1.vertices) {
-                    val direction = poly1.orient.mul(v, Vectors2D()).addi(B.position).subtract(startPoint)
+                    val direction = poly1.orientation.mul(v, Vec2()).plus(B.position).minus(startPoint)
                     projectRays(direction, bodiesToEvaluate)
                 }
             } else {
                 val circle = B.shape as Circle
-                val d = B.position.subtract(startPoint)
+                val d = B.position.minus(startPoint)
                 val angle = asin(circle.radius / d.length())
-                val u = Matrix2D(angle)
-                projectRays(u.mul(d.normalize(), Vectors2D()), bodiesToEvaluate)
-                val u2 = Matrix2D(-angle)
-                projectRays(u2.mul(d.normalize(), Vectors2D()), bodiesToEvaluate)
+                val u = Mat2(angle)
+                projectRays(u.mul(d.normalize(), Vec2()), bodiesToEvaluate)
+                val u2 = Mat2(-angle)
+                projectRays(u2.mul(d.normalize(), Vec2()), bodiesToEvaluate)
             }
         }
         rayData.sortWith { lhs: RayAngleInformation, rhs: RayAngleInformation ->
-            rhs.aNGLE.compareTo(lhs.aNGLE)
+            rhs.angle.compareTo(lhs.angle)
         }
     }
 
@@ -73,8 +73,8 @@ class ShadowCasting
      * @param direction        Direction of ray to project.
      * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
      */
-    private fun projectRays(direction: Vectors2D, bodiesToEvaluate: ArrayList<Body>) {
-        val m = Matrix2D(0.001)
+    private fun projectRays(direction: Vec2, bodiesToEvaluate: ArrayList<Body>) {
+        val m = Mat2(0.001)
         m.transpose().mul(direction)
         for (i in 0..2) {
             val ray = Ray(startPoint, direction, distance)
@@ -93,18 +93,18 @@ class ShadowCasting
      */
     fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         for (i in rayData.indices) {
-            val ray1 = rayData[i].rAY
-            val ray2 = rayData[if (i + 1 == rayData.size) 0 else i + 1].rAY
+            val ray1 = rayData[i].ray
+            val ray2 = rayData[if (i + 1 == rayData.size) 0 else i + 1].ray
             g.color = paintSettings.shadow
             val s = Path2D.Double()
             val worldStartPoint = camera.convertToScreen(startPoint)
             s.moveTo(worldStartPoint.x, worldStartPoint.y)
             if (ray1.rayInformation != null) {
-                val point1 = camera.convertToScreen(ray1.rayInformation!!.coord)
+                val point1 = camera.convertToScreen(ray1.rayInformation!!.coordinates)
                 s.lineTo(point1.x, point1.y)
             }
             if (ray2.rayInformation != null) {
-                val point2 = camera.convertToScreen(ray2.rayInformation!!.coord)
+                val point2 = camera.convertToScreen(ray2.rayInformation!!.coordinates)
                 s.lineTo(point2.x, point2.y)
             }
             s.closePath()
@@ -136,11 +136,11 @@ internal class RayAngleInformation
      *
      * @return returns RAY.
      */
-    val rAY: Ray,
+    val ray: Ray,
     /**
      * Getter for ANGLE.
      *
      * @return returns ANGLE.
      */
-    val aNGLE: Double
+    val angle: Double
 )

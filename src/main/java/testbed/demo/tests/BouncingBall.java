@@ -4,17 +4,16 @@ import library.dynamics.Body;
 import library.geometry.Circle;
 import library.geometry.Polygon;
 import library.dynamics.World;
-import library.math.Vectors2D;
-import testbed.Trail;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class BouncingBall {
     public static final String[] text = {"Bouncing Balls:"};
 
     public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
         World temp = testBedWindow.getWorld();
-        testBedWindow.setCamera(new Vectors2D(0, 200), 1.3);
+        testBedWindow.setCamera(new Vec2(0, 200), 1.3);
 
         {
             for (int i = 0; i < 10; i++) {

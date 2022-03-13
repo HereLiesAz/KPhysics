@@ -1,15 +1,15 @@
 package testbed.junittests;
 
-import library.math.Vectors2D;
+import library.math.Vec2;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
 
-public class Vectors2DTest {
+public class Vec2Test {
     @Test
     public void setUsingDoubleParameters() {
-        Vectors2D vec = new Vectors2D(4.0, 2.0);
+        Vec2 vec = new Vec2(4.0, 2.0);
         vec.set(33.0, 7.0);
         assertEquals(33.0, vec.getX(), 0);
         assertEquals(7.0, vec.getY(), 0);
@@ -17,16 +17,16 @@ public class Vectors2DTest {
 
     @Test
     public void setToVector() {
-        Vectors2D vec = new Vectors2D(103.2, -2489273423.2);
-        vec.set(new Vectors2D(-42.4, 92.1));
+        Vec2 vec = new Vec2(103.2, -2489273423.2);
+        vec.set(new Vec2(-42.4, 92.1));
         assertEquals(vec.getX(), -42.4, 0);
         assertEquals(vec.getY(), 92.1, 0);
     }
 
     @Test
     public void copy() {
-        Vectors2D vec1 = new Vectors2D(1.0, 1.0);
-        Vectors2D vec2 = vec1.copy();
+        Vec2 vec1 = new Vec2(1.0, 1.0);
+        Vec2 vec2 = vec1.copy();
         assertNotEquals(vec1, vec1.copy());
         assertEquals(vec1.getX(), vec2.getX(), 0);
         assertEquals(vec1.getY(), vec2.getY(), 0);
@@ -34,12 +34,12 @@ public class Vectors2DTest {
 
     @Test
     public void negative() {
-        Vectors2D vec = new Vectors2D(5.0, -7.0);
-        vec.negative();
+        Vec2 vec = new Vec2(5.0, -7.0);
+        vec.unaryMinus();
         assertEquals(vec.getX(), -5.0, 0);
         assertEquals(vec.getY(), 7.0, 0);
 
-        Vectors2D vec1 = vec.negative();
+        Vec2 vec1 = vec.unaryMinus();
         assertEquals(vec1.getX(), 5.0, 0);
         assertEquals(vec1.getY(), -7.0, 0);
         assertEquals(vec.getX(), 5.0, 0);
@@ -48,8 +48,8 @@ public class Vectors2DTest {
 
     @Test
     public void negativeVec() {
-        Vectors2D vec1 = new Vectors2D(5.0, 1.0);
-        Vectors2D vec2 = vec1.negativeVec();
+        Vec2 vec1 = new Vec2(5.0, 1.0);
+        Vec2 vec2 = vec1.copyNegative();
         assertEquals(5.0, vec1.getX(), 0);
         assertEquals(1.0, vec1.getY(), 0);
         assertEquals(-5.0, vec2.getX(), 0);
@@ -58,8 +58,8 @@ public class Vectors2DTest {
 
     @Test
     public void add() {
-        Vectors2D vec1 = new Vectors2D(5.0, 2.0);
-        Vectors2D vec2 = new Vectors2D(7.0, 1.0);
+        Vec2 vec1 = new Vec2(5.0, 2.0);
+        Vec2 vec2 = new Vec2(7.0, 1.0);
         vec1.add(vec2);
         assertEquals(12.0, vec1.getX(), 0);
         assertEquals(3.0, vec1.getY(), 0);
@@ -67,9 +67,9 @@ public class Vectors2DTest {
 
     @Test
     public void addi() {
-        Vectors2D vec1 = new Vectors2D(5.0, 2.0);
-        Vectors2D vec2 = new Vectors2D(7.0, 1.0);
-        vec2 = vec1.addi(vec2);
+        Vec2 vec1 = new Vec2(5.0, 2.0);
+        Vec2 vec2 = new Vec2(7.0, 1.0);
+        vec2 = vec1.plus(vec2);
         assertEquals(5.0, vec1.getX(), 0);
         assertEquals(2.0, vec1.getY(), 0);
         assertEquals(12.0, vec2.getX(), 0);
@@ -78,15 +78,15 @@ public class Vectors2DTest {
 
     @Test
     public void normal() {
-        Vectors2D vec1 = new Vectors2D(0.0, 1.0);
-        Vectors2D val = vec1.normal();
+        Vec2 vec1 = new Vec2(0.0, 1.0);
+        Vec2 val = vec1.normal();
         assertEquals(-1.0, val.getX(), 0);
         assertEquals(0.0, val.getY(), 0);
     }
 
     @Test
     public void normalize() {
-        Vectors2D vec1 = new Vectors2D(-345.34, 745.0);
+        Vec2 vec1 = new Vec2(-345.34, 745.0);
         vec1.normalize();
         assertEquals(vec1.length(), 1.0, 0);
         assertEquals(vec1.getX(), -0.4205573495355269, 0.0);
@@ -95,8 +95,8 @@ public class Vectors2DTest {
 
     @Test
     public void getNormalize() {
-        Vectors2D vec1 = new Vectors2D(1, 7);
-        Vectors2D val = vec1.getNormalized();
+        Vec2 vec1 = new Vec2(1, 7);
+        Vec2 val = vec1.getNormalized();
         assertEquals(0.1414213562373095, val.getX(), 0.0);
         assertEquals(0.9899494936611665, val.getY(), 0.0);
 
@@ -106,8 +106,8 @@ public class Vectors2DTest {
 
     @Test
     public void distance() {
-        Vectors2D vec1 = new Vectors2D(5.0, 2.0);
-        Vectors2D vec2 = new Vectors2D(7.0, 1.0);
+        Vec2 vec1 = new Vec2(5.0, 2.0);
+        Vec2 vec2 = new Vec2(7.0, 1.0);
         double dist = vec1.distance(vec2);
         //square root of 5
         assertEquals(2.2361, dist, 0.0001);
@@ -115,25 +115,25 @@ public class Vectors2DTest {
 
     @Test
     public void subtract() {
-        Vectors2D vec1 = new Vectors2D(5.0, 2.0);
-        Vectors2D vec2 = new Vectors2D(7.0, 1.0);
-        vec1 = vec1.subtract(vec2);
+        Vec2 vec1 = new Vec2(5.0, 2.0);
+        Vec2 vec2 = new Vec2(7.0, 1.0);
+        vec1 = vec1.minus(vec2);
         assertEquals(-2.0, vec1.getX(), 0);
         assertEquals(1.0, vec1.getY(), 0);
     }
 
     @Test
     public void vectorCrossProduct() {
-        Vectors2D vec1 = new Vectors2D(2.0, 3.0);
-        Vectors2D vec2 = new Vectors2D(5.0, 6.0);
-        double i = vec1.crossProduct(vec2);
+        Vec2 vec1 = new Vec2(2.0, 3.0);
+        Vec2 vec2 = new Vec2(5.0, 6.0);
+        double i = vec1.cross(vec2);
         assertEquals(-3.0, i, 0);
     }
 
     @Test
     public void scalarCrossProduct() {
-        Vectors2D vec1 = new Vectors2D(2.0, 3.0);
-        Vectors2D cross = vec1.crossProduct(4.0);
+        Vec2 vec1 = new Vec2(2.0, 3.0);
+        Vec2 cross = vec1.cross(4.0);
         assertEquals(2.0, vec1.getX(), 0);
         assertEquals(3.0, vec1.getY(), 0);
 
@@ -143,8 +143,8 @@ public class Vectors2DTest {
 
     @Test
     public void scalar() {
-        Vectors2D vec1 = new Vectors2D(5.0, 2.0);
-        Vectors2D vec2 = vec1.scalar(4.0f);
+        Vec2 vec1 = new Vec2(5.0, 2.0);
+        Vec2 vec2 = vec1.scalar(4.0f);
         assertEquals(5.0, vec1.getX(), 0);
         assertEquals(2.0, vec1.getY(), 0);
         assertEquals(20.0, vec2.getX(), 0);
@@ -153,65 +153,65 @@ public class Vectors2DTest {
 
     @Test
     public void dotProduct() {
-        Vectors2D vec1 = new Vectors2D(5.0, 1.0);
-        Vectors2D vec2 = new Vectors2D(15.0, 10.0);
-        double i = vec1.dotProduct(vec2);
+        Vec2 vec1 = new Vec2(5.0, 1.0);
+        Vec2 vec2 = new Vec2(15.0, 10.0);
+        double i = vec1.dot(vec2);
         assertEquals(85.0, i, 0);
     }
 
     @Test
     public void length() {
-        Vectors2D vec1 = new Vectors2D(0, 7);
+        Vec2 vec1 = new Vec2(0, 7);
         double val = vec1.length();
         assertEquals(7.0, val, 0);
     }
 
     @Test
     public void cross1() {
-        Vectors2D vec1 = new Vectors2D(5.03, 1.30);
-        Vectors2D w = Vectors2D.cross(6, vec1);
+        Vec2 vec1 = new Vec2(5.03, 1.30);
+        Vec2 w = Vec2.cross(6, vec1);
         assertEquals(7.8, w.getX(), 1e-15);
         assertEquals(-30.18, w.getY(), 1e-15);
 
-        vec1 = new Vectors2D(-3.75, 9.34);
-        w = Vectors2D.cross(1003.4, vec1);
+        vec1 = new Vec2(-3.75, 9.34);
+        w = Vec2.cross(1003.4, vec1);
         assertEquals(9371.756, w.getX(), 1e-15);
         assertEquals(3762.75, w.getY(), 1e-15);
     }
 
     @Test
     public void cross2() {
-        Vectors2D vec1 = new Vectors2D(5.03, 1.30);
-        Vectors2D w = Vectors2D.cross(6, vec1);
+        Vec2 vec1 = new Vec2(5.03, 1.30);
+        Vec2 w = Vec2.cross(6, vec1);
         assertEquals(-7.8, w.getX(), 1e-15);
         assertEquals(30.18, w.getY(), 1e-15);
 
-        vec1 = new Vectors2D(-3.75, 9.34);
-        w = Vectors2D.cross(1003.4, vec1);
+        vec1 = new Vec2(-3.75, 9.34);
+        w = Vec2.cross(1003.4, vec1);
         assertEquals(-9371.756, w.getX(), 1e-15);
         assertEquals(-3762.75, w.getY(), 1e-15);
     }
 
     @Test
     public void isValid() {
-        assertTrue(new Vectors2D(-34234.234234324, -324954.5).isValid());
-        assertTrue(new Vectors2D(32454543, 543543534.6).isValid());
-        assertTrue(new Vectors2D(Double.MAX_VALUE, -324954.5).isValid());
-        assertTrue(new Vectors2D(32454543, -Double.MAX_VALUE).isValid());
-        assertFalse(new Vectors2D(32454543, Double.POSITIVE_INFINITY).isValid());
-        assertFalse(new Vectors2D(32454543, -Double.POSITIVE_INFINITY).isValid());
+        assertTrue(new Vec2(-34234.234234324, -324954.5).isValid());
+        assertTrue(new Vec2(32454543, 543543534.6).isValid());
+        assertTrue(new Vec2(Double.MAX_VALUE, -324954.5).isValid());
+        assertTrue(new Vec2(32454543, -Double.MAX_VALUE).isValid());
+        assertFalse(new Vec2(32454543, Double.POSITIVE_INFINITY).isValid());
+        assertFalse(new Vec2(32454543, -Double.POSITIVE_INFINITY).isValid());
 
-        assertFalse(new Vectors2D(Double.POSITIVE_INFINITY, 234.534).isValid());
-        assertFalse(new Vectors2D(-Double.POSITIVE_INFINITY, 234.534324).isValid());
+        assertFalse(new Vec2(Double.POSITIVE_INFINITY, 234.534).isValid());
+        assertFalse(new Vec2(-Double.POSITIVE_INFINITY, 234.534324).isValid());
 
         //Has to be double inputs not integer or doesn't detect NAN
-        assertFalse(new Vectors2D(0.0 / 0, 234.534).isValid());
-        assertFalse(new Vectors2D(34255234.4, 0.0 / 0).isValid());
+        assertFalse(new Vec2(Double.NaN, 234.534).isValid());
+        assertFalse(new Vec2(34255234.4, Double.NaN).isValid());
     }
 
     @Test
     public void isZero() {
-        Vectors2D v = new Vectors2D();
+        Vec2 v = new Vec2();
 
         assertTrue(v.isZero());
 
@@ -226,18 +226,9 @@ public class Vectors2DTest {
     }
 
     @Test
-    public void createArray() {
-        Vectors2D[] vectorList = new Vectors2D[10];
-        for (Vectors2D v : vectorList) {
-            assertNull(v);
-        }
-        assertEquals(vectorList.length, 10);
-    }
-
-    @Test
     public void directionConstructor() {
-        Vectors2D v = new Vectors2D(2.0f,3.0f);
-        v.add(new Vectors2D(-1.2, -5.4));
+        Vec2 v = new Vec2(2.0f,3.0f);
+        v.add(new Vec2(-1.2, -5.4));
         assertEquals(0.8, v.getX(), 0);
         assertEquals(-2.4, v.getY(), 1e-15);
     }

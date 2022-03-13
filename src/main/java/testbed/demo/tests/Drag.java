@@ -4,14 +4,14 @@ import library.dynamics.Body;
 import library.dynamics.World;
 import library.geometry.Circle;
 import library.geometry.Polygon;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class Drag {
     public static final String[] text = {"Drag:"};
 
     public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
         World temp = testBedWindow.getWorld();
 
         for (int i = 0; i < 13; i++) {

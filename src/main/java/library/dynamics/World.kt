@@ -1,47 +1,32 @@
 package library.dynamics
 
-import library.collision.AABB
+import library.collision.AxisAlignedBoundingBox
 import library.collision.Arbiter
 import library.joints.Joint
-import library.math.Vectors2D
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
 import java.awt.geom.Line2D
+import kotlin.math.pow
 
 /**
  * Class for creating a world with iterative solver structure.
+ *
+ * @param gravity The strength of gravity in the world.
  */
-class World {
-    private var gravity: Vectors2D
-
-    /**
-     * Constructor
-     *
-     * @param gravity The strength of gravity in the world.
-     */
-    constructor(gravity: Vectors2D) {
-        this.gravity = gravity
-    }
-
-    /**
-     * Default constructor
-     */
-    constructor() {
-        gravity = Vectors2D(.0, .0)
-    }
+class World(private var gravity: Vec2 = Vec2()) {
 
     /**
      * Sets gravity.
      *
      * @param gravity The strength of gravity in the world.
      */
-    fun setGravity(gravity: Vectors2D) {
+    fun setGravity(gravity: Vec2) {
         this.gravity = gravity
     }
 
-    @kotlin.jvm.JvmField
-    var bodies = ArrayList<Body?>()
+    var bodies = ArrayList<Body>()
 
     /**
      * Adds a body to the world
@@ -49,7 +34,7 @@ class World {
      * @param b Body to add.
      * @return Returns the newly added body.
      */
-    fun addBody(b: Body?): Body? {
+    fun addBody(b: Body): Body {
         bodies.add(b)
         return b
     }
@@ -59,11 +44,11 @@ class World {
      *
      * @param b The body to remove from the world.
      */
-    fun removeBody(b: Body?) {
+    fun removeBody(b: Body) {
         bodies.remove(b)
     }
 
-    @kotlin.jvm.JvmField
+    @JvmField
     var joints = ArrayList<Joint>()
 
     /**
@@ -112,11 +97,11 @@ class World {
     private fun semiImplicit(dt: Double) {
         //Applies tentative velocities
         applyForces(dt)
-        solve(dt)
+        solve()
 
         //Integrate positions
         for (b in bodies) {
-            if (b!!.invMass == 0.0) {
+            if (b.invMass == 0.0) {
                 continue
             }
             b.position.add(b.velocity.scalar(dt))
@@ -133,7 +118,7 @@ class World {
      */
     private fun applyForces(dt: Double) {
         for (b in bodies) {
-            if (b!!.invMass == 0.0) {
+            if (b.invMass == 0.0) {
                 continue
             }
             applyLinearDrag(b)
@@ -141,16 +126,14 @@ class World {
                 b.velocity.add(gravity.scalar(dt))
             }
             b.velocity.add(b.force.scalar(b.invMass).scalar(dt))
-            b.angularVelocity += dt * b.invI * b.torque
+            b.angularVelocity += dt * b.invInertia * b.torque
         }
     }
 
     /**
      * Method to apply all forces in the world.
-     *
-     * @param dt Timestep
      */
-    private fun solve(dt: Double) {
+    private fun solve() {
         /*
         Resolve joints
         Note: this is removed from the iterations at this stage as the application of forces is different.
@@ -179,7 +162,7 @@ class World {
         val velocityMagnitude = b!!.velocity.length()
         val dragForceMagnitude = velocityMagnitude * velocityMagnitude * b.linearDampening
         val dragForceVector = b.velocity.normalized.scalar(-dragForceMagnitude)
-        b.applyForceToCentre(dragForceVector)
+        b.applyForce(dragForceVector)
     }
 
     /**
@@ -192,10 +175,10 @@ class World {
                 val b = bodies[x]
 
                 //Ignores static or particle objects
-                if (a!!.invMass == 0.0 && b!!.invMass == 0.0 || a.particle && b!!.particle) {
+                if (a.invMass == 0.0 && b.invMass == 0.0 || a.particle && b.particle) {
                     continue
                 }
-                if (AABB.aabbOverlap(a, b!!)) {
+                if (AxisAlignedBoundingBox.aabbOverlap(a, b)) {
                     narrowPhaseCheck(a, b)
                 }
             }
@@ -209,8 +192,8 @@ class World {
      * @param a
      * @param b
      */
-    private fun narrowPhaseCheck(a: Body?, b: Body?) {
-        val contactQuery = Arbiter(a!!, b!!)
+    private fun narrowPhaseCheck(a: Body, b: Body) {
+        val contactQuery = Arbiter(a, b)
         contactQuery.narrowPhase()
         if (contactQuery.contactCount > 0) {
             contacts.add(contactQuery)
@@ -231,16 +214,16 @@ class World {
      */
     fun gravityBetweenObj() {
         for (a in bodies.indices) {
-            val A = bodies[a]
+            val bodyA = bodies[a]
             for (b in a + 1 until bodies.size) {
-                val B = bodies[b]
-                val distance = A!!.position.distance(B!!.position)
-                val force = Math.pow(6.67, -11.0) * A.mass * B.mass / (distance * distance)
-                var direction: Vectors2D? = Vectors2D(B.position.x - A.position.x, B.position.y - A.position.y)
+                val bodyB = bodies[b]
+                val distance = bodyA.position.distance(bodyB.position)
+                val force = 6.67.pow(-11.0) * bodyA.mass * bodyB.mass / (distance * distance)
+                var direction: Vec2? = Vec2(bodyB.position.x - bodyA.position.x, bodyB.position.y - bodyA.position.y)
                 direction = direction!!.scalar(force)
-                val oppositeDir = Vectors2D(-direction.x, -direction.y)
-                A.force.addi(direction)
-                B.force.addi(oppositeDir)
+                val oppositeDir = Vec2(-direction.x, -direction.y)
+                bodyA.force.plus(direction)
+                bodyB.force.plus(oppositeDir)
             }
         }
     }
@@ -255,17 +238,14 @@ class World {
     fun drawContact(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         for (contact in contacts) {
             val point = contact.contacts[0]
-            var line: Vectors2D?
-            var beginningOfLine: Vectors2D
-            var endOfLine: Vectors2D
             g.color = paintSettings.contactPoint
-            line = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR)
-            beginningOfLine = camera.convertToScreen(point.addi(line))
-            endOfLine = camera.convertToScreen(point.subtract(line))
+            var line: Vec2 = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR)
+            var beginningOfLine: Vec2 = camera.convertToScreen(point.plus(line))
+            var endOfLine: Vec2 = camera.convertToScreen(point.minus(line))
             g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
             line = contact.contactNormal.scalar(paintSettings.NORMAL_LINE_SCALAR)
-            beginningOfLine = camera.convertToScreen(point.addi(line))
-            endOfLine = camera.convertToScreen(point.subtract(line))
+            beginningOfLine = camera.convertToScreen(point.plus(line))
+            endOfLine = camera.convertToScreen(point.minus(line))
             g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
         }
     }

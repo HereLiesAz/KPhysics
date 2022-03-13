@@ -1,50 +1,31 @@
 package library.math
 
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
+
 /**
  * 2D Vectors class
+ *
+ * @param x Sets x value.
+ * @param y Sets y value.
  */
-class Vectors2D {
-    var x: Double
-    var y: Double
-
-    /**
-     * Default constructor - x/y initialised to zero.
-     */
-    constructor() {
-        x = 0.0
-        y = 0.0
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param x Sets x value.
-     * @param y Sets y value.
-     */
-    constructor(x: Double, y: Double) {
-        this.x = x
-        this.y = y
-    }
+class Vec2(var x: Double = .0, var y: Double = .0) {
 
     /**
      * Copy constructor.
      *
      * @param vector Vector to copy.
      */
-    constructor(vector: Vectors2D?) {
-        x = vector!!.x
-        y = vector.y
-    }
+    constructor(vector: Vec2) : this(vector.x, vector.y)
 
     /**
      * Constructs a normalised direction vector.
      *
      * @param direction Direction in radians.
      */
-    constructor(direction: Double) {
-        x = Math.cos(direction)
-        y = Math.sin(direction)
-    }
+    constructor(direction: Double): this(cos(direction), sin(direction))
 
     /**
      * Sets a vector to equal an x/y value and returns this.
@@ -53,7 +34,7 @@ class Vectors2D {
      * @param y y value.
      * @return The current instance vector.
      */
-    operator fun set(x: Double, y: Double): Vectors2D {
+    operator fun set(x: Double, y: Double): Vec2 {
         this.x = x
         this.y = y
         return this
@@ -65,8 +46,8 @@ class Vectors2D {
      * @param v1 Vector to set x/y values to.
      * @return The current instance vector.
      */
-    fun set(v1: Vectors2D?): Vectors2D {
-        x = v1!!.x
+    fun set(v1: Vec2): Vec2 {
+        x = v1.x
         y = v1.y
         return this
     }
@@ -74,10 +55,10 @@ class Vectors2D {
     /**
      * Copy method to return a new copy of the current instance vector.
      *
-     * @return A new Vectors2D object.
+     * @return A new Vec2 object.
      */
-    fun copy(): Vectors2D {
-        return Vectors2D(x, y)
+    fun copy(): Vec2 {
+        return Vec2(x, y)
     }
 
     /**
@@ -85,7 +66,7 @@ class Vectors2D {
      *
      * @return Return the negative form of the instance vector.
      */
-    fun negative(): Vectors2D {
+    operator fun unaryMinus(): Vec2 {
         x = -x
         y = -y
         return this
@@ -96,8 +77,8 @@ class Vectors2D {
      *
      * @return Returns a new negative vector of the current instance vector.
      */
-    fun negativeVec(): Vectors2D {
-        return Vectors2D(-x, -y)
+    fun copyNegative(): Vec2 {
+        return Vec2(-x, -y)
     }
 
     /**
@@ -106,9 +87,9 @@ class Vectors2D {
      * @param v Vector to add.
      * @return Returns the current instance vector.
      */
-    fun add(v: Vectors2D?): Vectors2D {
-        x = x + v!!.x
-        y = y + v.y
+    fun add(v: Vec2): Vec2 {
+        x += v.x
+        y += v.y
         return this
     }
 
@@ -116,10 +97,10 @@ class Vectors2D {
      * Adds a vector and the current instance vector together and returns a new vector of them added together.
      *
      * @param v Vector to add.
-     * @return Returns a new Vectors2D of the sum of the addition of the two vectors.
+     * @return Returns a new Vec2 of the sum of the addition of the two vectors.
      */
-    fun addi(v: Vectors2D?): Vectors2D {
-        return Vectors2D(x + v!!.x, y + v.y)
+    operator fun plus(v: Vec2): Vec2 {
+        return Vec2(x + v.x, y + v.y)
     }
 
     /**
@@ -127,8 +108,8 @@ class Vectors2D {
      *
      * @return A normal of the current instance vector.
      */
-    fun normal(): Vectors2D {
-        return Vectors2D(-y, x)
+    fun normal(): Vec2 {
+        return Vec2(-y, x)
     }
 
     /**
@@ -136,8 +117,8 @@ class Vectors2D {
      *
      * @return Returns the normalized version of the current instance vector.
      */
-    fun normalize(): Vectors2D {
-        var d = Math.sqrt(x * x + y * y)
+    fun normalize(): Vec2 {
+        var d = sqrt(x * x + y * y)
         if (d == 0.0) {
             d = 1.0
         }
@@ -151,13 +132,13 @@ class Vectors2D {
      *
      * @return A normalized vector of the current instance vector.
      */
-    val normalized: Vectors2D
+    val normalized: Vec2
         get() {
-            var d = Math.sqrt(x * x + y * y)
+            var d = sqrt(x * x + y * y)
             if (d == 0.0) {
                 d = 1.0
             }
-            return Vectors2D(x / d, y / d)
+            return Vec2(x / d, y / d)
         }
 
     /**
@@ -166,20 +147,20 @@ class Vectors2D {
      * @param v Vector to find distance from.
      * @return Returns distance from vector v to the current instance vector.
      */
-    fun distance(v: Vectors2D?): Double {
-        val dx = x - v!!.x
+    fun distance(v: Vec2): Double {
+        val dx = x - v.x
         val dy = y - v.y
-        return StrictMath.sqrt(dx * dx + dy * dy)
+        return sqrt(dx * dx + dy * dy)
     }
 
     /**
      * Subtract a vector from the current instance vector.
      *
      * @param v1 Vector to subtract.
-     * @return Returns a new Vectors2D with the subtracted vector applied
+     * @return Returns a new Vec2 with the subtracted vector applied
      */
-    fun subtract(v1: Vectors2D?): Vectors2D {
-        return Vectors2D(x - v1!!.x, y - v1.y)
+    operator fun minus(v1: Vec2): Vec2 {
+        return Vec2(x - v1.x, y - v1.y)
     }
 
     /**
@@ -188,16 +169,16 @@ class Vectors2D {
      * @param v1 Other vector to apply cross product to
      * @return double
      */
-    fun crossProduct(v1: Vectors2D?): Double {
-        return x * v1!!.y - y * v1.x
+    fun cross(v1: Vec2): Double {
+        return x * v1.y - y * v1.x
     }
 
-    fun crossProduct(a: Double): Vectors2D {
+    fun cross(a: Double): Vec2 {
         return normal().scalar(a)
     }
 
-    fun scalar(a: Double): Vectors2D {
-        return Vectors2D(x * a, y * a)
+    fun scalar(a: Double): Vec2 {
+        return Vec2(x * a, y * a)
     }
 
     /**
@@ -206,8 +187,8 @@ class Vectors2D {
      * @param v1 Other vector to apply dotproduct to.
      * @return double
      */
-    fun dotProduct(v1: Vectors2D?): Double {
-        return v1!!.x * x + v1.y * y
+    fun dot(v1: Vec2): Double {
+        return v1.x * x + v1.y * y
     }
 
     /**
@@ -216,7 +197,7 @@ class Vectors2D {
      * @return double
      */
     fun length(): Double {
-        return Math.sqrt(x * x + y * y)
+        return sqrt(x * x + y * y)
     }
 
     /**
@@ -235,10 +216,10 @@ class Vectors2D {
      * @return boolean value whether the vector is set to (0,0).
      */
     val isZero: Boolean
-        get() = Math.abs(x) == 0.0 && Math.abs(y) == 0.0
+        get() = abs(x) == 0.0 && abs(y) == 0.0
 
     override fun toString(): String {
-        return x.toString() + " : " + y
+        return "$x : $y"
     }
 
     companion object {
@@ -247,34 +228,34 @@ class Vectors2D {
          * [.cross]
          *
          * @param s double.
-         * @param a Vectors2D.
+         * @param a Vec2.
          * @return Cross product scalar result.
          */
-        fun cross(a: Vectors2D, s: Double): Vectors2D {
-            return Vectors2D(s * a.y, -s * a.x)
+        fun cross(a: Vec2, s: Double): Vec2 {
+            return Vec2(s * a.y, -s * a.x)
         }
 
         /**
          * Finds the cross product of a scalar and a vector. Produces a scalar in 2D.
          *
          * @param s double.
-         * @param a Vectors2D.
+         * @param a Vec2.
          * @return Cross product scalar result.
          */
-        @kotlin.jvm.JvmStatic
-        fun cross(s: Double, a: Vectors2D): Vectors2D {
-            return Vectors2D(-s * a.y, s * a.x)
+        @JvmStatic
+        fun cross(s: Double, a: Vec2): Vec2 {
+            return Vec2(-s * a.y, s * a.x)
         }
 
         /**
          * Generates an array of length n with zero initialised vectors.
          *
          * @param n Length of array.
-         * @return A Vectors2D array of zero initialised vectors.
+         * @return A Vec2 array of zero initialised vectors.
          */
-        @kotlin.jvm.JvmStatic
-        fun createArray(n: Int): Array<Vectors2D?> {
-            val array = arrayOfNulls<Vectors2D>(n)
+        @JvmStatic
+        fun createArray(n: Int): Array<Vec2?> {
+            val array = arrayOfNulls<Vec2>(n)
 
             array.forEach {
                 if (it != null) {

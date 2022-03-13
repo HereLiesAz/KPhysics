@@ -1,7 +1,7 @@
 package library.rays
 
 import library.dynamics.Body
-import library.math.Vectors2D
+import library.math.Vec2
 
 /**
  * Ray information class to store relevant data about rays and any intersection found.
@@ -15,11 +15,11 @@ class RayInformation {
     val b: Body
 
     /**
-     * Getter for coord variable.
+     * Getter for coords variable.
      *
-     * @return returns coord variable of type Vectors2D.
+     * @return returns coords variable of type Vec2.
      */
-    val coord: Vectors2D
+    val coordinates: Vec2
 
     /**
      * Getter for index variable.
@@ -39,7 +39,7 @@ class RayInformation {
      */
     constructor(b: Body, x: Double, y: Double, index: Int) {
         this.b = b
-        coord = Vectors2D(x, y)
+        coordinates = Vec2(x, y)
         this.index = index
     }
 
@@ -51,9 +51,9 @@ class RayInformation {
      * @param v     x/y position of intersection.
      * @param index Index of shapes side that intersection intersects.
      */
-    constructor(b: Body, v: Vectors2D, index: Int) {
+    constructor(b: Body, v: Vec2, index: Int) {
         this.b = b
-        coord = v.copy()
+        coordinates = v.copy()
         this.index = index
     }
 }

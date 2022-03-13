@@ -3,16 +3,16 @@ package testbed.demo.tests;
 import library.dynamics.Body;
 import library.geometry.Polygon;
 import library.dynamics.World;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class StackedObjects {
     public static final String[] text = {"Stacked Objects:"};
 
     public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
         World temp = testBedWindow.getWorld();
-        testBedWindow.setCamera(new Vectors2D(0, 150), 1.8);
+        testBedWindow.setCamera(new Vec2(0, 150), 1.8);
 
         {
             for (int x = 0; x < 15; x++) {

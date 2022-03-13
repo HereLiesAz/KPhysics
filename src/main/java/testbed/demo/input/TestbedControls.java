@@ -2,7 +2,7 @@ package testbed.demo.input;
 
 import library.explosions.ParticleExplosion;
 import library.explosions.ProximityExplosion;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import library.dynamics.Settings;
 import testbed.Camera;
 import testbed.demo.TestBedWindow;
@@ -96,7 +96,7 @@ public abstract class TestbedControls {
     }
 
     private void resetUniqueEventHandlers() {
-        TESTBED.setCamera(new Vectors2D(0, 0), 1);
+        TESTBED.setCamera(new Vec2(0, 0), 1);
         TESTBED.followPayload = false;
         ProximityExplosionTest.active = false;
         ParticleExplosionTest.active = false;
@@ -108,13 +108,13 @@ public abstract class TestbedControls {
     }
 
     protected void setProximityEpicentre(MouseEvent e) {
-        Vectors2D v = CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY()));
+        Vec2 v = CAMERA.convertToWorld(new Vec2(e.getX(), e.getY()));
         ProximityExplosion p = (ProximityExplosion) TESTBED.getRayExplosions().get(0);
         p.setEpicentre(v);
     }
 
     protected void generateParticleExplosion(MouseEvent e) {
-        ParticleExplosion p = new ParticleExplosion(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())), 100, 10);
+        ParticleExplosion p = new ParticleExplosion(CAMERA.convertToWorld(new Vec2(e.getX(), e.getY())), 100, 10);
         p.createParticles(0.5, 100, 5, TESTBED.getWorld());
         p.applyBlastImpulse(100);
         TESTBED.add(p, 2);

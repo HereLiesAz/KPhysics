@@ -1,7 +1,7 @@
 package testbed.demo.input;
 
 import library.rays.Slice;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 import testbed.demo.tests.ParticleExplosionTest;
 import testbed.demo.tests.ProximityExplosionTest;
@@ -24,7 +24,7 @@ public class MouseInput extends TestbedControls implements MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            CAMERA.setPointClicked(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())));
+            CAMERA.setPointClicked(CAMERA.convertToWorld(new Vec2(e.getX(), e.getY())));
         }
     }
 
@@ -40,11 +40,11 @@ public class MouseInput extends TestbedControls implements MouseListener {
                 RaycastExplosionTest.r.applyBlastImpulse(500000);
             } else if (SliceObjects.active) {
                 if (TESTBED.getSlicesSize() == 1) {
-                    TESTBED.getSlices().get(0).setDirection(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())));
+                    TESTBED.getSlices().get(0).setDirection(CAMERA.convertToWorld(new Vec2(e.getX(), e.getY())));
                     TESTBED.getSlices().get(0).sliceObjects(TESTBED.getWorld());
                     TESTBED.getSlices().clear();
                 } else {
-                    Slice s = new Slice(CAMERA.convertToWorld(new Vectors2D(e.getX(), e.getY())), new Vectors2D(1, 0), 0);
+                    Slice s = new Slice(CAMERA.convertToWorld(new Vec2(e.getX(), e.getY())), new Vec2(1, 0), 0);
                     TESTBED.add(s);
                 }
             }

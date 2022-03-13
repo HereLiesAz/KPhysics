@@ -1,8 +1,8 @@
 package library.joints
 
 import library.dynamics.Body
-import library.math.Matrix2D
-import library.math.Vectors2D
+import library.math.Mat2
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -16,55 +16,34 @@ class JointToPoint
  * Convenience constructor that works like
  * [.JointToPoint]
  *
- * @param point         The point the joint is attached to
+ * @param pointAttachedTo The point the joint is attached to
  * @param b1            First body the joint is attached to
  * @param jointLength   The desired distance of the joint between two points/bodies
  * @param jointConstant The strength of the joint
  * @param dampening     The dampening constant to use for the joints forces
  * @param canGoSlack    Boolean whether the joint can go slack or not
- * @param offset1       Offset to be applied to the location of the joint relative to b1's object space
+ * @param offset       Offset to be applied to the location of the joint relative to b1's object space
  */(
     b1: Body,
-    private val pointAttachedTo: Vectors2D,
+    private val pointAttachedTo: Vec2,
     jointLength: Double,
     jointConstant: Double,
     dampening: Double,
     canGoSlack: Boolean,
-    offset1: Vectors2D?
-) : Joint(b1, jointLength, jointConstant, dampening, canGoSlack, offset1) {
-    /**
-     * Constructor for a joint between a body and a point.
-     *
-     * @param point         The point the joint is attached to
-     * @param b1            First body the joint is attached to
-     * @param jointLength   The desired distance of the joint between two points/bodies
-     * @param jointConstant The strength of the joint
-     * @param dampening     The dampening constant to use for the joints forces
-     * @param canGoSlack    Boolean whether the joint can go slack or not
-     * @param offset1       Offset to be applied to the location of the joint relative to b1's object space
-     */
-    constructor(
-        point: Vectors2D,
-        b1: Body,
-        jointLength: Double,
-        jointConstant: Double,
-        dampening: Double,
-        canGoSlack: Boolean,
-        offset1: Vectors2D?
-    ) : this(b1, point, jointLength, jointConstant, dampening, canGoSlack, offset1) {
-    }
+    offset: Vec2
+) : Joint(b1, jointLength, jointConstant, dampening, canGoSlack, offset) {
 
     /**
      * Applies tension to the body attached to the joint.
      */
     override fun applyTension() {
-        val mat1 = Matrix2D(object1.orientation)
-        object1AttachmentPoint = object1.position.addi(mat1.mul(offset1, Vectors2D()))
+        val mat1 = Mat2(body.orientation)
+        object1AttachmentPoint = body.position.plus(mat1.mul(offset, Vec2()))
         val tension = calculateTension()
-        val distance = pointAttachedTo.subtract(object1AttachmentPoint)
+        val distance = pointAttachedTo.minus(object1AttachmentPoint)
         distance.normalize()
         val impulse = distance.scalar(tension)
-        object1.applyLinearImpulse(impulse, object1AttachmentPoint!!.subtract(object1.position))
+        body.applyLinearImpulse(impulse, object1AttachmentPoint.minus(body.position))
     }
 
     /**
@@ -73,7 +52,7 @@ class JointToPoint
      * @return double value of the tension force between the point and attached bodies point
      */
     override fun calculateTension(): Double {
-        val distance = object1AttachmentPoint!!.subtract(pointAttachedTo).length()
+        val distance = object1AttachmentPoint.minus(pointAttachedTo).length()
         if (distance < naturalLength && canGoSlack) {
             return .0
         }
@@ -89,11 +68,11 @@ class JointToPoint
      * @return double value of the rate of change
      */
     override fun rateOfChangeOfExtension(): Double {
-        val distance = pointAttachedTo.subtract(object1AttachmentPoint)
+        val distance = pointAttachedTo.minus(object1AttachmentPoint)
         distance.normalize()
-        val relativeVelocity = object1.velocity.negativeVec()
-            .subtract(object1AttachmentPoint!!.subtract(object1.position).crossProduct(object1.angularVelocity))
-        return relativeVelocity.dotProduct(distance)
+        val relativeVelocity = body.velocity.copyNegative()
+            .minus(object1AttachmentPoint.minus(body.position).cross(body.angularVelocity))
+        return relativeVelocity.dot(distance)
     }
 
     /**

@@ -2,7 +2,7 @@ package testbed.demo.tests;
 
 import library.rays.ShadowCasting;
 import library.dynamics.World;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 import java.awt.*;
@@ -13,13 +13,13 @@ public class LineOfSight {
     public static ShadowCasting b;
 
     public static void load(TestBedWindow testBedWindow) {
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
-        testBedWindow.setCamera(new Vectors2D(-120, 20), 3.3);
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
+        testBedWindow.setCamera(new Vec2(-120, 20), 3.3);
         active = true;
 
         testBedWindow.generateBoxOfObjects();
 
-        b = new ShadowCasting(new Vectors2D(-1000, 0), 11000);
+        b = new ShadowCasting(new Vec2(-1000, 0), 11000);
         testBedWindow.add(b);
     }
 

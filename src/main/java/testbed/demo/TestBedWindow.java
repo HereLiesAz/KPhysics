@@ -1,6 +1,6 @@
 package testbed.demo;
 
-import library.collision.AABB;
+import library.collision.AxisAlignedBoundingBox;
 import library.dynamics.*;
 import library.explosions.Explosion;
 import library.explosions.ParticleExplosion;
@@ -12,7 +12,7 @@ import library.rays.ShadowCasting;
 import library.rays.Slice;
 import library.dynamics.Settings;
 import testbed.ColourSettings;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.Camera;
 import testbed.DemoText;
 import testbed.Trail;
@@ -30,7 +30,7 @@ import java.util.Iterator;
 public class TestBedWindow extends JPanel implements Runnable {
     private final Camera CAMERA;
 
-    public void setCamera(Vectors2D centre, double zoom) {
+    public void setCamera(Vec2 centre, double zoom) {
         CAMERA.setCentre(centre);
         CAMERA.setZoom(zoom);
     }
@@ -42,12 +42,6 @@ public class TestBedWindow extends JPanel implements Runnable {
     private final boolean ANTIALIASING;
     private final Thread PHYSICS_THREAD;
 
-    //Input handler classes
-    private final KeyBoardInput KEY_INPUT;
-    private final MouseInput MOUSE_INPUT;
-    private final MouseScroll MOUSE_SCROLL_INPUT;
-    private final MouseMotionListener MOUSE_MOTION_INPUT;
-
     public TestBedWindow(boolean antiAliasing) {
         this.ANTIALIASING = antiAliasing;
 
@@ -56,16 +50,17 @@ public class TestBedWindow extends JPanel implements Runnable {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         CAMERA = new Camera((int) screenSize.getWidth(), (int) screenSize.getHeight(), this);
 
-        MOUSE_INPUT = new MouseInput(this);
+        MouseInput MOUSE_INPUT = new MouseInput(this);
         addMouseListener(MOUSE_INPUT);
 
-        KEY_INPUT = new KeyBoardInput(this);
+        //Input handler classes
+        KeyBoardInput KEY_INPUT = new KeyBoardInput(this);
         addKeyListener(KEY_INPUT);
 
-        MOUSE_SCROLL_INPUT = new MouseScroll(this);
+        MouseScroll MOUSE_SCROLL_INPUT = new MouseScroll(this);
         addMouseWheelListener(MOUSE_SCROLL_INPUT);
 
-        MOUSE_MOTION_INPUT = new MouseMovement(this);
+        MouseMotionListener MOUSE_MOTION_INPUT = new MouseMovement(this);
         addMouseMotionListener(MOUSE_MOTION_INPUT);
 
         Chains.load(this);
@@ -165,16 +160,16 @@ public class TestBedWindow extends JPanel implements Runnable {
             if (Raycast.active) {
                 Raycast.action(r);
             }
-            r.updateProjection(world.bodies);
+            r.updateProjection(world.getBodies());
         }
         for (Explosion p : explosionObj) {
-            p.update(world.bodies);
+            p.update(world.getBodies());
         }
         for (ShadowCasting s : shadowCastings) {
-            s.updateProjections(world.bodies);
+            s.updateProjections(world.getBodies());
         }
         for (Slice s : slices) {
-            s.updateProjection(world.bodies);
+            s.updateProjection(world.getBodies());
         }
     }
 
@@ -228,7 +223,7 @@ public class TestBedWindow extends JPanel implements Runnable {
         }
         Iterator<ParticleExplosion> p = particles.iterator();
         while (p.hasNext()) {
-            Body[] s = p.next().getParticles();
+            Body[] s = p.next().getParticles().toArray(new Body[0]);
             if (containsBody(s, bodiesToRemove)) {
                 removeParticlesFromWorld(s);
                 p.remove();
@@ -286,7 +281,7 @@ public class TestBedWindow extends JPanel implements Runnable {
         setBackground(PAINT_SETTINGS.background);
         update();
         if (followPayload){
-            setCamera(new Vectors2D(world.bodies.get(3).getPosition().getX(), getCamera().centre.getY()) , 2.0);
+            setCamera(new Vec2(world.getBodies().get(3).getPosition().getX(), getCamera().centre.getY()) , 2.0);
         }
         if (PAINT_SETTINGS.getDrawGrid()) {
             drawGridMethod(g2d);
@@ -295,7 +290,7 @@ public class TestBedWindow extends JPanel implements Runnable {
             s.draw(g2d, PAINT_SETTINGS, CAMERA);
         }
         drawTrails(g2d);
-        for (Body b : world.bodies) {
+        for (Body b : world.getBodies()) {
             if (PAINT_SETTINGS.getDrawShapes()) {
                 b.getShape().draw(g2d, PAINT_SETTINGS, CAMERA);
             }
@@ -338,12 +333,12 @@ public class TestBedWindow extends JPanel implements Runnable {
                 g2d.setColor(PAINT_SETTINGS.gridAxis);
             }
 
-            Vectors2D currentMinY = CAMERA.convertToScreen(new Vectors2D(minXY + i, minXY));
-            Vectors2D currentMaxY = CAMERA.convertToScreen(new Vectors2D(minXY + i, projection));
+            Vec2 currentMinY = CAMERA.convertToScreen(new Vec2(minXY + i, minXY));
+            Vec2 currentMaxY = CAMERA.convertToScreen(new Vec2(minXY + i, projection));
             g2d.draw(new Line2D.Double(currentMinY.getX(), currentMinY.getY(), currentMaxY.getX(), currentMaxY.getY()));
 
-            Vectors2D currentMinX = CAMERA.convertToScreen(new Vectors2D(minXY, minXY + i));
-            Vectors2D currentMaxX = CAMERA.convertToScreen(new Vectors2D(projection, minXY + i));
+            Vec2 currentMinX = CAMERA.convertToScreen(new Vec2(minXY, minXY + i));
+            Vec2 currentMaxX = CAMERA.convertToScreen(new Vec2(projection, minXY + i));
             g2d.draw(new Line2D.Double(currentMinX.getX(), currentMinX.getY(), currentMaxX.getX(), currentMaxX.getY()));
 
             if (i == projection) {
@@ -358,7 +353,7 @@ public class TestBedWindow extends JPanel implements Runnable {
         for (Trail t : trailsToBodies) {
             Path2D.Double s = new Path2D.Double();
             for (int i = 0; i < t.getTrailPoints().length; i++) {
-                Vectors2D v = t.getTrailPoints()[i];
+                Vec2 v = t.getTrailPoints()[i];
                 if (v == null) {
                     break;
                 } else {
@@ -390,7 +385,7 @@ public class TestBedWindow extends JPanel implements Runnable {
             JMenuBar menuBar = new JMenuBar();
             menuBar.add(createTestMenu(gameScreen));
             menuBar.add(createColourSchemeMenu(gameScreen));
-            menuBar.add(createFrequencyMenu(gameScreen));
+            menuBar.add(createFrequencyMenu());
             menuBar.add(createDisplayMenu(gameScreen));
             window.setJMenuBar(menuBar);
 
@@ -428,7 +423,7 @@ public class TestBedWindow extends JPanel implements Runnable {
         return drawOptions;
     }
 
-    private static Component createFrequencyMenu(TestBedWindow gameScreen) {
+    private static Component createFrequencyMenu() {
         JMenu hertzMenu = new JMenu("Hertz");
         int number = 30;
         for (int i = 1; i < 5; i++) {
@@ -551,7 +546,7 @@ public class TestBedWindow extends JPanel implements Runnable {
         return testMenu;
     }
 
-    public void generateRandomObjects(Vectors2D lowerBound, Vectors2D upperBound, int totalObjects, int maxRadius) {
+    public void generateRandomObjects(Vec2 lowerBound, Vec2 upperBound, int totalObjects, int maxRadius) {
         while (totalObjects > 0) {
             Body b = createRandomObject(lowerBound, upperBound, maxRadius);
             if (overlap(b)) {
@@ -583,34 +578,34 @@ public class TestBedWindow extends JPanel implements Runnable {
         }
 
         {
-            generateRandomObjects(new Vectors2D(-880, -480), new Vectors2D(880, 480), 30, 100);
+            generateRandomObjects(new Vec2(-880, -480), new Vec2(880, 480), 30, 100);
             setStaticWorldBodies();
         }
     }
 
     private boolean overlap(Body b) {
-        for (Body a : world.bodies) {
-            if (AABB.aabbOverlap(a, b)) {
+        for (Body a : world.getBodies()) {
+            if (AxisAlignedBoundingBox.aabbOverlap(a, b)) {
                 return false;
             }
         }
         return true;
     }
 
-    private Body createRandomObject(Vectors2D lowerBound, Vectors2D upperBound, int maxRadius) {
-        int objectType = Settings.generateRandomNoInRange(1, 2);
+    private Body createRandomObject(Vec2 lowerBound, Vec2 upperBound, int maxRadius) {
+        int objectType = Settings.random(1, 2);
         Body b = null;
-        int radius = Settings.generateRandomNoInRange(5, maxRadius);
-        double x = Settings.generateRandomNoInRange((int) (lowerBound.getX() + radius), (int) (upperBound.getX() - radius));
-        double y = Settings.generateRandomNoInRange((int) (lowerBound.getY() + radius), (int) (upperBound.getY() - radius));
-        double rotation = Settings.generateRandomNoInRange(0, (int) 7.0);
+        int radius = Settings.random(5, maxRadius);
+        double x = Settings.random((int) (lowerBound.getX() + radius), (int) (upperBound.getX() - radius));
+        double y = Settings.random((int) (lowerBound.getY() + radius), (int) (upperBound.getY() - radius));
+        double rotation = Settings.random(0, (int) 7.0);
         switch (objectType) {
             case 1 -> {
                 b = new Body(new Circle(radius), x, y);
                 b.setOrientation(rotation);
             }
             case 2 -> {
-                int sides = Settings.generateRandomNoInRange(3, 10);
+                int sides = Settings.random(3, 10);
                 b = new Body(new Polygon(radius, sides), x, y);
                 b.setOrientation(rotation);
             }
@@ -619,7 +614,7 @@ public class TestBedWindow extends JPanel implements Runnable {
     }
 
     public void setStaticWorldBodies() {
-        for (Body b : world.bodies) {
+        for (Body b : world.getBodies()) {
             b.setDensity(0);
         }
     }
@@ -732,7 +727,7 @@ public class TestBedWindow extends JPanel implements Runnable {
 
     //Removes friction from the world
     public void setWorldIce() {
-        for (Body b : world.bodies) {
+        for (Body b : world.getBodies()) {
             b.setStaticFriction(0.0);
             b.setDynamicFriction(0.0);
         }
@@ -740,7 +735,7 @@ public class TestBedWindow extends JPanel implements Runnable {
 
     // Scaled friction by a passed ratio
     public void scaleWorldFriction(double ratio) {
-        for (Body b : world.bodies) {
+        for (Body b : world.getBodies()) {
             b.setStaticFriction(b.getStaticFriction() * ratio);
             b.setDynamicFriction(b.getDynamicFriction() * ratio);
         }

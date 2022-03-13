@@ -3,7 +3,7 @@ package testbed.demo.tests;
 import library.dynamics.Body;
 import library.dynamics.World;
 import library.geometry.Polygon;
-import library.math.Vectors2D;
+import library.math.Vec2;
 import testbed.demo.TestBedWindow;
 
 public class SliceObjects {
@@ -12,9 +12,9 @@ public class SliceObjects {
 
     public static void load(TestBedWindow testBedWindow) {
         active = true;
-        testBedWindow.setWorld(new World(new Vectors2D(0, -9.81)));
+        testBedWindow.setWorld(new World(new Vec2(0, -9.81)));
         World temp = testBedWindow.getWorld();
-        testBedWindow.setCamera(new Vectors2D(0, 100), 1.3);
+        testBedWindow.setCamera(new Vec2(0, 100), 1.3);
 
         Body ground = new Body(new Polygon(10000.0, 2000.0), 0, -2040);
         ground.setDensity(0);

@@ -3,32 +3,23 @@ package library.explosions
 import library.dynamics.Body
 import library.dynamics.World
 import library.geometry.Circle
-import library.math.Matrix2D
-import library.math.Vectors2D
+import library.math.Mat2
+import library.math.Vec2
 
 /**
  * Models particle explosions.
+ *
+ * @param epicentre     Vector location of explosion epicenter.
+ * @param noOfParticles Total number of particles the explosion has.
+ * @param lifespan          The life time of the particle.
  */
-class ParticleExplosion(private val epicentre: Vectors2D, private val noOfParticles: Int, life: Double) {
+class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: Int, private val lifespan: Double) {
     /**
      * Getter to return the list of particles in the world.
      *
      * @return Array of bodies.
      */
-    val particles: Array<Body?>
-    private val lifespan: Double
-
-    /**
-     * Constructor.
-     *
-     * @param epicentre     Vector location of explosion epicenter.
-     * @param noOfParticles Total number of particles the explosion has.
-     * @param life          The life time of the particle.
-     */
-    init {
-        particles = arrayOfNulls(noOfParticles)
-        lifespan = life
-    }
+    val particles = MutableList(noOfParticles) { Body(Circle(.0),.0, .0) }
 
     /**
      * Creates particles in the supplied world.
@@ -40,10 +31,10 @@ class ParticleExplosion(private val epicentre: Vectors2D, private val noOfPartic
      */
     fun createParticles(size: Double, density: Int, radius: Int, world: World) {
         val separationAngle = 6.28319 / noOfParticles
-        val distanceFromCentre = Vectors2D(.0, radius.toDouble())
-        val rotate = Matrix2D(separationAngle)
+        val distanceFromCentre = Vec2(.0, radius.toDouble())
+        val rotate = Mat2(separationAngle)
         for (i in 0 until noOfParticles) {
-            val particlePlacement = epicentre.addi(distanceFromCentre)
+            val particlePlacement = epicentre.plus(distanceFromCentre)
             val b = Body(Circle(size), particlePlacement.x, particlePlacement.y)
             b.setDensity(density.toDouble())
             b.restitution = 1.0
@@ -64,9 +55,9 @@ class ParticleExplosion(private val epicentre: Vectors2D, private val noOfPartic
      * @param blastPower The impulse magnitude.
      */
     fun applyBlastImpulse(blastPower: Double) {
-        var line: Vectors2D
+        var line: Vec2
         for (b in particles) {
-            line = b!!.position.subtract(epicentre)
+            line = b.position.minus(epicentre)
             b.velocity.set(line.scalar(blastPower))
         }
     }

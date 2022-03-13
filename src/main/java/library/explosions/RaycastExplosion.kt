@@ -1,7 +1,7 @@
 package library.explosions
 
 import library.dynamics.Body
-import library.math.Vectors2D
+import library.math.Vec2
 import library.rays.RayInformation
 import testbed.Camera
 import testbed.ColourSettings
@@ -9,8 +9,13 @@ import java.awt.Graphics2D
 
 /**
  * Models raycast explosions.
+ *
+ * @param epicentre   The epicentre of the explosion.
+ * @param noOfRays    Number of projected rays.
+ * @param distance    Distance of projected rays.
+ * @param worldBodies The world the rays effect and are projected in.
  */
-class RaycastExplosion(epicentre: Vectors2D, noOfRays: Int, distance: Int, worldBodies: ArrayList<Body>) : Explosion {
+class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<Body>) : Explosion {
     private val rayScatter: RayScatter
 
     /**
@@ -18,20 +23,12 @@ class RaycastExplosion(epicentre: Vectors2D, noOfRays: Int, distance: Int, world
      *
      * @param v The vector position of the new epicentre.
      */
-    override fun setEpicentre(v: Vectors2D) {
+    override fun setEpicentre(v: Vec2) {
         rayScatter.epicentre = v
     }
 
-    var raysInContact = ArrayList<RayInformation>()
+    private var raysInContact = ArrayList<RayInformation>()
 
-    /**
-     * Constructor
-     *
-     * @param epicentre   The epicentre of the explosion.
-     * @param noOfRays    Number of projected rays.
-     * @param distance    Distance of projected rays.
-     * @param worldBodies The world the rays effect and are projected in.
-     */
     init {
         rayScatter = RayScatter(epicentre, noOfRays)
         rayScatter.castRays(distance)
@@ -48,7 +45,7 @@ class RaycastExplosion(epicentre: Vectors2D, noOfRays: Int, distance: Int, world
         rayScatter.updateRays(bodiesToEvaluate)
         val rayArray = rayScatter.rays
         for (ray in rayArray) {
-            val rayInfo = ray?.rayInformation
+            val rayInfo = ray.rayInformation
             if (rayInfo != null) {
                 raysInContact.add(rayInfo)
             }
@@ -62,13 +59,13 @@ class RaycastExplosion(epicentre: Vectors2D, noOfRays: Int, distance: Int, world
      */
     override fun applyBlastImpulse(blastPower: Double) {
         for (ray in raysInContact) {
-            val blastDir = ray.coord.subtract(rayScatter.epicentre)
+            val blastDir = ray.coordinates.minus(rayScatter.epicentre)
             val distance = blastDir.length()
             if (distance == 0.0) return
             val invDistance = 1 / distance
             val impulseMag = blastDir.normalize().scalar(blastPower * invDistance)
             val b = ray.b
-            b!!.applyLinearImpulse(impulseMag, ray.coord.subtract(b.position))
+            b.applyLinearImpulse(impulseMag, ray.coordinates.minus(b.position))
         }
     }
 

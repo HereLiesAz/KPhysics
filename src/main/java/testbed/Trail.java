@@ -1,15 +1,15 @@
 package testbed;
 
 import library.dynamics.Body;
-import library.math.Vectors2D;
+import library.math.Vec2;
 
 public class Trail {
-    private final Vectors2D[] trailPoints;
+    private final Vec2[] trailPoints;
     private final int arrayEndPos;
     private final int skipInterval;
     private int counter;
     private final double lifeSpan;
-    private Body body;
+    private final Body body;
     private double timeActive;
 
     public Body getBody() {
@@ -17,7 +17,7 @@ public class Trail {
     }
 
     public Trail(int noOfTrailPoints, int skipInterval, Body b, double life) {
-        trailPoints = Vectors2D.createArray(noOfTrailPoints);
+        trailPoints = Vec2.createArray(noOfTrailPoints);
         arrayEndPos = noOfTrailPoints - 1;
         this.skipInterval = skipInterval;
         counter = 0;
@@ -43,7 +43,7 @@ public class Trail {
         }
     }
 
-    public Vectors2D[] getTrailPoints() {
+    public Vec2[] getTrailPoints() {
         return trailPoints;
     }
 

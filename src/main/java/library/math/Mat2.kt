@@ -1,16 +1,14 @@
 package library.math
 
-class Matrix2D {
-    @kotlin.jvm.JvmField
-    var row1 = Vectors2D()
+class Mat2 {
+    var row1 = Vec2()
 
-    @kotlin.jvm.JvmField
-    var row2 = Vectors2D()
+    var row2 = Vec2()
 
     /**
      * Default constructor matrix [(0,0),(0,0)] by default.
      */
-    constructor() {}
+    constructor()
 
     /**
      * Constructs and sets the matrix up to be a rotation matrix that stores the angle specified in the matrix.
@@ -37,15 +35,15 @@ class Matrix2D {
      * Sets current object matrix to be the same as the supplied parameters matrix.
      * @param m Matrix to set current object to
      */
-    fun set(m: Matrix2D) {
+    fun set(m: Mat2) {
         row1.x = m.row1.x
         row1.y = m.row1.y
         row2.x = m.row2.x
         row2.y = m.row2.y
     }
 
-    fun transpose(): Matrix2D {
-        val mat = Matrix2D()
+    fun transpose(): Mat2 {
+        val mat = Mat2()
         mat.row1.x = row1.x
         mat.row1.y = row2.x
         mat.row2.x = row1.y
@@ -53,7 +51,7 @@ class Matrix2D {
         return mat
     }
 
-    fun mul(v: Vectors2D?): Vectors2D {
+    fun mul(v: Vec2?): Vec2 {
         val x = v!!.x
         val y = v.y
         v.x = row1.x * x + row1.y * y
@@ -61,7 +59,7 @@ class Matrix2D {
         return v
     }
 
-    fun mul(v: Vectors2D?, out: Vectors2D): Vectors2D {
+    fun mul(v: Vec2?, out: Vec2): Vec2 {
         out.x = row1.x * v!!.x + row1.y * v.y
         out.y = row2.x * v.x + row2.y * v.y
         return out
@@ -70,15 +68,5 @@ class Matrix2D {
     override fun toString(): String {
         return """${row1.x} : ${row1.y}
 ${row2.x} : ${row2.y}"""
-    }
-
-    companion object {
-        fun main(args: Array<String>) {
-            val test = Vectors2D(5.0, .0)
-            val m = Matrix2D()
-            m.set(0.5)
-            m.mul(test)
-            println(test)
-        }
     }
 }

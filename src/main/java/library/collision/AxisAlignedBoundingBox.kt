@@ -1,12 +1,17 @@
 package library.collision
 
 import library.dynamics.Body
-import library.math.Vectors2D
+import library.math.Vec2
 
 /**
  * Axis aligned bounding box volume class. Allows the creation of bounding volumes to make broad phase collision check possible and easy to do.
+ *
+ * Constructor to generate an AABB given a minimum and maximum bound in the form of two vectors.
+ *
+ * @param min Lower bound of AABB vertex.
+ * @param max Higher bound of AABB vertex.
  */
-class AABB {
+class AxisAlignedBoundingBox(min: Vec2 = Vec2(), max: Vec2 = Vec2()) {
     /**
      * Getter for min variable for lower bound vertex.
      *
@@ -15,7 +20,7 @@ class AABB {
     /**
      * Lower left vertex of bounding box.
      */
-    var min: Vectors2D
+    var min: Vec2 = min
         private set
     /**
      * Getter for max variable for upper bound vertex.
@@ -25,34 +30,15 @@ class AABB {
     /**
      * Top right vertex of bounding box.
      */
-    var max: Vectors2D
+    var max: Vec2 = max
         private set
-
-    /**
-     * Constructor to generate an AABB given a minimum and maximum bound in the form of two vectors.
-     *
-     * @param min Lower bound of AABB vertex.
-     * @param max Higher bound of AABB vertex.
-     */
-    constructor(min: Vectors2D, max: Vectors2D) {
-        this.min = min.copy()
-        this.max = max.copy()
-    }
-
-    /**
-     * Default constructor generating an AABB with (0,0) upper and lower bounds.
-     */
-    constructor() {
-        min = Vectors2D()
-        max = Vectors2D()
-    }
 
     /**
      * Sets the current objects bounds equal to that of the passed AABB argument.
      *
      * @param aabb An AABB bounding box.
      */
-    fun set(aabb: AABB) {
+    fun set(aabb: AxisAlignedBoundingBox) {
         val v = aabb.min
         min.x = v.x
         min.y = v.y
@@ -83,7 +69,7 @@ class AABB {
      * @param point A point to check if its inside the AABB's object space. Point needs to also be in object space.
      * @return Boolean value whether or not the point lies inside the AABB bounds.
      */
-    fun AABBOverLap(point: Vectors2D): Boolean {
+    fun aabbOverlap(point: Vec2): Boolean {
         val x = point.x
         val y = point.y
         return x <= max.x && x >= min.x && y >= max.y && y <= min.y
@@ -94,7 +80,7 @@ class AABB {
      *
      * @param offset A vector to apply to the min and max vectors to translate the bounds and therefore AABB to desired position.
      */
-    fun addOffset(offset: Vectors2D?) {
+    fun addOffset(offset: Vec2) {
         min.add(offset)
         max.add(offset)
     }
@@ -108,37 +94,37 @@ class AABB {
      *
      * @return New AABB that's the same as the current object.
      */
-    fun copy(): AABB {
-        return AABB(min, max)
+    fun copy(): AxisAlignedBoundingBox {
+        return AxisAlignedBoundingBox(min, max)
     }
 
     companion object {
         /**
          * Checks whether two body's AABB's overlap in world space.
          *
-         * @param a First body to evaluate.
-         * @param b Second body to evaluate.
+         * @param bodyA First body to evaluate.
+         * @param bodyB Second body to evaluate.
          * @return Boolean value of whether the two bodies AABB's overlap in world space.
          */
         @JvmStatic
-        fun aabbOverlap(a: Body, b: Body): Boolean {
-            val aCopy = a.aabb.copy()
-            val bCopy = b.aabb.copy()
-            aCopy.addOffset(a.position)
-            bCopy.addOffset(b.position)
+        fun aabbOverlap(bodyA: Body, bodyB: Body): Boolean {
+            val aCopy = bodyA.aabb.copy()
+            val bCopy = bodyB.aabb.copy()
+            aCopy.addOffset(bodyA.position)
+            bCopy.addOffset(bodyB.position)
             return aabbOverlap(aCopy, bCopy)
         }
 
         /**
          * Method to check if two AABB's overlap. Can be seen as world space.
          *
-         * @param a First AABB to evaluate.
-         * @param b Second AABB to evaluate.
+         * @param boxA First AABB to evaluate.
+         * @param boxB Second AABB to evaluate.
          * @return Boolean value of whether two bounds of the AABB's overlap.
          */
         @JvmStatic
-        fun aabbOverlap(a: AABB, b: AABB): Boolean {
-            return a.min.x <= b.max.x && a.max.x >= b.min.x && a.min.y <= b.max.y && a.max.y >= b.min.y
+        fun aabbOverlap(boxA: AxisAlignedBoundingBox, boxB: AxisAlignedBoundingBox): Boolean {
+            return boxA.min.x <= boxB.max.x && boxA.max.x >= boxB.min.x && boxA.min.y <= boxB.max.y && boxA.max.y >= boxB.min.y
         }
     }
 }

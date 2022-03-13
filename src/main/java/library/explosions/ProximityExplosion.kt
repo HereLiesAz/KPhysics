@@ -1,7 +1,7 @@
 package library.explosions
 
 import library.dynamics.Body
-import library.math.Vectors2D
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -16,18 +16,18 @@ class ProximityExplosion
  * Constructor.
  *
  * @param epicentre The epicentre of the explosion.
- * @param radius    The proximity in which bodies are effected.
- */(private var epicentre: Vectors2D, private val proximity: Int) : Explosion {
+ * @param proximity    The proximity in which bodies are effected.
+ */(private var epicentre: Vec2, private val proximity: Int) : Explosion {
     /**
      * Sets the epicentre to a different coordinate.
      *
      * @param v The vector position of the new epicentre.
      */
-    override fun setEpicentre(v: Vectors2D) {
+    override fun setEpicentre(v: Vec2) {
         epicentre = v
     }
 
-    var bodiesEffected = ArrayList<Body>()
+    private var bodiesEffected = ArrayList<Body>()
 
     /**
      * Updates the arraylist to reevaluate what bodies are effected/within the proximity.
@@ -37,19 +37,19 @@ class ProximityExplosion
     override fun update(bodiesToEvaluate: ArrayList<Body>) {
         bodiesEffected.clear()
         for (b in bodiesToEvaluate) {
-            val blastDist = b.position.subtract(epicentre)
-            if (blastDist!!.length() <= proximity) {
+            val blastDist = b.position.minus(epicentre)
+            if (blastDist.length() <= proximity) {
                 bodiesEffected.add(b)
             }
         }
     }
 
-    private val linesToBodies = ArrayList<Vectors2D?>()
+    private val linesToBodies = ArrayList<Vec2?>()
 
     /**
      * Updates the lines to body array for the debug drawer.
      */
-    fun updateLinesToBody() {
+    private fun updateLinesToBody() {
         linesToBodies.clear()
         for (b in bodiesEffected) {
             linesToBodies.add(b.position)
@@ -99,14 +99,14 @@ class ProximityExplosion
      */
     override fun applyBlastImpulse(blastPower: Double) {
         for (b in bodiesEffected) {
-            val blastDir = b.position.subtract(epicentre)
-            val distance = blastDir!!.length()
+            val blastDir = b.position.minus(epicentre)
+            val distance = blastDir.length()
             if (distance == 0.0) return
 
             //Not physically correct as it should be blast * radius to object ^ 2 as the pressure of an explosion in 2D dissipates
             val invDistance = 1 / distance
             val impulseMag = blastPower * invDistance
-            b.applyLinearImpulseToCentre(blastDir.normalize().scalar(impulseMag))
+            b.applyLinearImpulse(blastDir.normalize().scalar(impulseMag))
         }
     }
 }

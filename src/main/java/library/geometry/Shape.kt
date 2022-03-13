@@ -1,8 +1,8 @@
 package library.geometry
 
 import library.dynamics.Body
-import library.math.Matrix2D
-import library.math.Vectors2D
+import library.math.Mat2
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -12,16 +12,9 @@ import java.awt.geom.Path2D
 /**
  * Abstract class presenting a geometric shape.
  */
-abstract class Shapes internal constructor() {
+abstract class Shape internal constructor() {
     lateinit var body: Body
-    var orient: Matrix2D
-
-    /**
-     * Default constructor
-     */
-    init {
-        orient = Matrix2D()
-    }
+    var orientation: Mat2 = Mat2()
 
     /**
      * Calculates the mass of a shape.
@@ -54,8 +47,8 @@ abstract class Shapes internal constructor() {
     fun drawAABB(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.aabb
         val polyBB: Path2D = Path2D.Double()
-        val min = camera.convertToScreen(body.aabb.min.addi(body.position))
-        val max = camera.convertToScreen(body.aabb.max.addi(body.position))
+        val min = camera.convertToScreen(body.aabb.min.plus(body.position))
+        val max = camera.convertToScreen(body.aabb.max.plus(body.position))
         polyBB.moveTo(min.x, min.y)
         polyBB.lineTo(min.x, max.y)
         polyBB.lineTo(max.x, max.y)
@@ -74,14 +67,14 @@ abstract class Shapes internal constructor() {
     fun drawCOMS(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
         g.color = paintSettings.centreOfMass
         val centre = body.position
-        val line = Vectors2D(paintSettings.COM_RADIUS.toDouble(), .0)
-        orient.mul(line)
-        var beginningOfLine = camera.convertToScreen(centre.addi(line))
-        var endOfLine = camera.convertToScreen(centre.subtract(line))
+        val line = Vec2(paintSettings.COM_RADIUS.toDouble(), .0)
+        orientation.mul(line)
+        var beginningOfLine = camera.convertToScreen(centre.plus(line))
+        var endOfLine = camera.convertToScreen(centre.minus(line))
         val lin1: Line2D = Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y)
         g.draw(lin1)
-        beginningOfLine = camera.convertToScreen(centre.addi(line.normal()))
-        endOfLine = camera.convertToScreen(centre.subtract(line.normal()))
+        beginningOfLine = camera.convertToScreen(centre.plus(line.normal()))
+        endOfLine = camera.convertToScreen(centre.minus(line.normal()))
         val lin2: Line2D = Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y)
         g.draw(lin2)
     }

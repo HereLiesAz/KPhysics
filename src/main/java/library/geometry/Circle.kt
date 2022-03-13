@@ -1,7 +1,7 @@
 package library.geometry
 
-import library.collision.AABB
-import library.math.Vectors2D
+import library.collision.AxisAlignedBoundingBox
+import library.math.Vec2
 import testbed.Camera
 import testbed.ColourSettings
 import java.awt.Graphics2D
@@ -15,7 +15,7 @@ class Circle
  * Constructor for a circle.
  *
  * @param radius Desired radius of the circle.
- */(var radius: Double) : Shapes() {
+ */(var radius: Double) : Shape() {
     /**
      * Calculates the mass of a circle.
      *
@@ -24,15 +24,15 @@ class Circle
     override fun calcMass(density: Double) {
         body.mass = StrictMath.PI * radius * radius * density
         body.invMass = if (body.mass != 0.0) 1.0f / body.mass else 0.0
-        body.I = body.mass * radius * radius
-        body.invI = if (body.I != 0.0) 1.0f / body.I else 0.0
+        body.inertia = body.mass * radius * radius
+        body.invInertia = if (body.inertia != 0.0) 1.0f / body.inertia else 0.0
     }
 
     /**
      * Generates an AABB and binds it to the body.
      */
     override fun createAABB() {
-        body.aabb = AABB(Vectors2D(-radius, -radius), Vectors2D(radius, radius))
+        body.aabb = AxisAlignedBoundingBox(Vec2(-radius, -radius), Vec2(radius, radius))
     }
 
     /**
