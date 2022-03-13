@@ -1,14 +1,10 @@
 package library.rays
 
-import demo.Camera
-import demo.ColourSettings
 import library.dynamics.Body
 import library.dynamics.World
 import library.geometry.Circle
 import library.geometry.Polygon
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Line2D
 import kotlin.math.sqrt
 
 /**
@@ -18,10 +14,15 @@ import kotlin.math.sqrt
  * @param direction  The direction of the ray points in radians.
  * @param distance   The distance the ray is projected
  */
-class Slice(private val startPoint: Vec2, direction: Vec2, distance: Double) {
-    private var distance: Double
-    private var direction: Vec2
-    private val intersectingBodiesInfo = ArrayList<RayInformation>()
+class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
+    var distance: Double
+    var direction: Vec2 = direction
+        set(value) {
+            field = value.minus(startPoint)
+            distance = direction.length()
+            direction.normalize()
+        }
+    val intersectingBodiesInfo = ArrayList<RayInformation>()
 
     init {
         this.direction = direction.normalized
@@ -174,38 +175,5 @@ class Slice(private val startPoint: Vec2, direction: Vec2, distance: Double) {
         if (accumulatedArea == 0.0) return Vec2()
         accumulatedArea *= 3.0
         return Vec2(centerX / accumulatedArea, centerY / accumulatedArea)
-    }
-
-    /**
-     * Debug draw method for slice object.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        g.color = paintSettings.projectedRay
-        val epicenter = camera.convertToScreen(startPoint)
-        val endPoint = camera.convertToScreen(direction.scalar(distance).plus(startPoint))
-        g.draw(Line2D.Double(epicenter.x, epicenter.y, endPoint.x, endPoint.y))
-        g.color = paintSettings.rayToBody
-        for (i in intersectingBodiesInfo.indices) {
-            if ((i + 1) % 2 == 0) {
-                val intersection1 = camera.convertToScreen(intersectingBodiesInfo[i - 1].coordinates)
-                val intersection2 = camera.convertToScreen(intersectingBodiesInfo[i].coordinates)
-                g.draw(Line2D.Double(intersection2.x, intersection2.y, intersection1.x, intersection1.y))
-            }
-        }
-    }
-
-    /**
-     * Sets the direction of the ray to a different value.
-     *
-     * @param sliceVector Desired direction value
-     */
-    fun setDirection(sliceVector: Vec2) {
-        direction = sliceVector.minus(startPoint)
-        distance = direction.length()
-        direction.normalize()
     }
 }

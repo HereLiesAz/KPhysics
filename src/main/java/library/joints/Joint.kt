@@ -1,11 +1,8 @@
 package library.joints
 
-import demo.Camera
-import demo.ColourSettings
 import library.dynamics.Body
 import library.math.Mat2
 import library.math.Vec2
-import java.awt.Graphics2D
 
 /**
  * Abstract class for joints holding all the common properties of joints.
@@ -25,7 +22,7 @@ abstract class Joint protected constructor(
     protected val canGoSlack: Boolean,
     protected val offset: Vec2
 ) {
-    protected var object1AttachmentPoint: Vec2
+    var object1AttachmentPoint: Vec2
 
     init {
         val u = Mat2(body.orientation)
@@ -49,13 +46,4 @@ abstract class Joint protected constructor(
      * @return double value of the rate of change
      */
     abstract fun rateOfChangeOfExtension(): Double
-
-    /**
-     * Abstract draw method using graphics2D from java.swing for debug drawer.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    abstract fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera)
 }

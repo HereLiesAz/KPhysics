@@ -1,11 +1,7 @@
 package library.geometry
 
-import demo.Camera
-import demo.ColourSettings
 import library.collision.AxisAlignedBoundingBox
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Path2D
 
 /**
  * Class for representing polygon shape.
@@ -133,39 +129,6 @@ class Polygon : Shape {
             }
         }
         body.aabb = AxisAlignedBoundingBox(Vec2(minX, minY), Vec2(maxX, maxY))
-    }
-
-    /**
-     * Debug draw method for a polygon.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        val s = Path2D.Double()
-        for (i in vertices.indices) {
-            var v = Vec2(vertices[i])
-            orientation.mul(v)
-            v.add(body.position)
-            v = camera.convertToScreen(v)
-            if (i == 0) {
-                s.moveTo(v.x, v.y)
-            } else {
-                s.lineTo(v.x, v.y)
-            }
-        }
-        s.closePath()
-        if (body.mass == 0.0) {
-            g.color = paintSettings.staticFill
-            g.fill(s)
-            g.color = paintSettings.staticOutLine
-        } else {
-            g.color = paintSettings.shapeFill
-            g.fill(s)
-            g.color = paintSettings.shapeOutLine
-        }
-        g.draw(s)
     }
 
     /**

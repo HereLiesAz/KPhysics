@@ -1,20 +1,19 @@
 package demo.window;
 
-import demo.Camera;
-import demo.ColourSettings;
-import demo.DemoText;
-import demo.Trail;
+import demo.utils.ColourSettings;
+import demo.utils.Painter;
+import demo.utils.Trail;
 import demo.input.*;
-import demo.tests.Car;
 import demo.tests.Chains;
 import demo.tests.Raycast;
-import demo.tests.StackedObjects;
 import library.collision.AxisAlignedBoundingBox;
 import library.dynamics.Body;
 import library.dynamics.Settings;
 import library.dynamics.World;
 import library.explosions.Explosion;
 import library.explosions.ParticleExplosion;
+import library.explosions.ProximityExplosion;
+import library.explosions.RaycastExplosion;
 import library.geometry.Circle;
 import library.geometry.Polygon;
 import library.joints.Joint;
@@ -293,36 +292,38 @@ public class TestBedWindow extends JPanel implements Runnable {
             drawGridMethod(g2d);
         }
         for (ShadowCasting s : shadowCastings) {
-            s.draw(g2d, PAINT_SETTINGS, CAMERA);
+            Painter.shadowDraw(g2d, PAINT_SETTINGS, CAMERA, s);
         }
         drawTrails(g2d);
         for (Body b : world.getBodies()) {
             if (PAINT_SETTINGS.getDrawShapes()) {
-                b.getShape().draw(g2d, PAINT_SETTINGS, CAMERA);
+                if(b.getShape() instanceof Circle) Painter.circleDraw(g2d, PAINT_SETTINGS, CAMERA, b);
+                else if(b.getShape() instanceof Polygon) Painter.polygonDraw(g2d, PAINT_SETTINGS, CAMERA, b);
             }
             if (PAINT_SETTINGS.getDrawAABBs()) {
-                b.getShape().drawAABB(g2d, PAINT_SETTINGS, CAMERA);
+                Painter.drawAABB(g2d, PAINT_SETTINGS, CAMERA, b);
             }
             if (PAINT_SETTINGS.getDrawCOMs()) {
-                b.getShape().drawCOMS(g2d, PAINT_SETTINGS, CAMERA);
+                Painter.drawCOMS(g2d, PAINT_SETTINGS, CAMERA, b);
             }
         }
         if (PAINT_SETTINGS.getDrawContacts()) {
-            world.drawContact(g2d, PAINT_SETTINGS, CAMERA);
+            Painter.worldDrawContact(g2d, PAINT_SETTINGS, CAMERA, world);
         }
         if (PAINT_SETTINGS.getDrawJoints()) {
             for (Joint j : world.joints) {
-                j.draw(g2d, PAINT_SETTINGS, CAMERA);
+                Painter.drawJoint(g2d, PAINT_SETTINGS, CAMERA, j);
             }
         }
         for (Explosion p : explosionObj) {
-            p.draw(g2d, PAINT_SETTINGS, CAMERA);
+            if(p instanceof RaycastExplosion) Painter.rayExplosionDraw(g2d, PAINT_SETTINGS, CAMERA, (RaycastExplosion) p);
+            else if(p instanceof ProximityExplosion) Painter.explosionDraw(g2d, PAINT_SETTINGS, CAMERA, (ProximityExplosion) p);
         }
         for (Ray r : rays) {
-            r.draw(g2d, PAINT_SETTINGS, CAMERA);
+            Painter.rayDraw(g2d, PAINT_SETTINGS, CAMERA, r);
         }
         for (Slice s : slices) {
-            s.draw(g2d, PAINT_SETTINGS, CAMERA);
+            Painter.sliceDraw(g2d, PAINT_SETTINGS, CAMERA, s);
         }
         DemoText.draw(g2d, PAINT_SETTINGS, currentDemo);
     }

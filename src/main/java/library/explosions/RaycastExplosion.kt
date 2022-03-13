@@ -1,11 +1,8 @@
 package library.explosions
 
-import demo.Camera
-import demo.ColourSettings
 import library.dynamics.Body
 import library.math.Vec2
 import library.rays.RayInformation
-import java.awt.Graphics2D
 
 /**
  * Models raycast explosions.
@@ -16,7 +13,7 @@ import java.awt.Graphics2D
  * @param worldBodies The world the rays effect and are projected in.
  */
 class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<Body>) : Explosion {
-    private val rayScatter: RayScatter
+    val rayScatter: RayScatter
 
     /**
      * Sets the epicentre to a different coordinate.
@@ -67,16 +64,5 @@ class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodie
             val b = ray.b
             b.applyLinearImpulse(impulseMag, ray.coordinates.minus(b.position))
         }
-    }
-
-    /**
-     * Debug draw method for all rays projected.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        rayScatter.draw(g, paintSettings, camera)
     }
 }

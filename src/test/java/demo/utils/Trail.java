@@ -1,4 +1,4 @@
-package demo;
+package demo.utils;
 
 import library.dynamics.Body;
 import library.math.Vec2;

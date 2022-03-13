@@ -1,6 +1,6 @@
 package demo.input;
 
-import demo.Camera;
+import demo.window.Camera;
 import demo.tests.*;
 import demo.window.TestBedWindow;
 import library.dynamics.Settings;

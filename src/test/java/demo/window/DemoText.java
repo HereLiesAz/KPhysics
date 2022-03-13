@@ -1,5 +1,6 @@
-package demo;
+package demo.window;
 
+import demo.utils.ColourSettings;
 import demo.tests.*;
 import library.dynamics.Settings;
 

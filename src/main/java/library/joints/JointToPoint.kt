@@ -1,12 +1,8 @@
 package library.joints
 
-import demo.Camera
-import demo.ColourSettings
 import library.dynamics.Body
 import library.math.Mat2
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Line2D
 
 /**
  * Class for a joint between a body and a point in world space.
@@ -25,7 +21,7 @@ class JointToPoint
  * @param offset       Offset to be applied to the location of the joint relative to b1's object space
  */(
     b1: Body,
-    private val pointAttachedTo: Vec2,
+    val pointAttachedTo: Vec2,
     jointLength: Double,
     jointConstant: Double,
     dampening: Double,
@@ -73,19 +69,5 @@ class JointToPoint
         val relativeVelocity = body.velocity.copyNegative()
             .minus(object1AttachmentPoint.minus(body.position).cross(body.angularVelocity))
         return relativeVelocity.dot(distance)
-    }
-
-    /**
-     * Implementation of the draw method.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        g.color = paintSettings.joints
-        val obj1Pos = camera.convertToScreen(object1AttachmentPoint)
-        val obj2Pos = camera.convertToScreen(pointAttachedTo)
-        g.draw(Line2D.Double(obj1Pos.x, obj1Pos.y, obj2Pos.x, obj2Pos.y))
     }
 }

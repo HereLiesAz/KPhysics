@@ -1,13 +1,9 @@
 package library.dynamics
 
-import demo.Camera
-import demo.ColourSettings
 import library.collision.Arbiter
 import library.collision.AxisAlignedBoundingBox
 import library.joints.Joint
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Line2D
 import kotlin.math.pow
 
 /**
@@ -15,16 +11,7 @@ import kotlin.math.pow
  *
  * @param gravity The strength of gravity in the world.
  */
-class World(private var gravity: Vec2 = Vec2()) {
-
-    /**
-     * Sets gravity.
-     *
-     * @param gravity The strength of gravity in the world.
-     */
-    fun setGravity(gravity: Vec2) {
-        this.gravity = gravity
-    }
+class World(var gravity: Vec2 = Vec2()) {
 
     var bodies = ArrayList<Body>()
 
@@ -225,28 +212,6 @@ class World(private var gravity: Vec2 = Vec2()) {
                 bodyA.force.plus(direction)
                 bodyB.force.plus(oppositeDir)
             }
-        }
-    }
-
-    /**
-     * Debug draw method for world objects.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    fun drawContact(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        for (contact in contacts) {
-            val point = contact.contacts[0]
-            g.color = paintSettings.contactPoint
-            var line: Vec2 = contact.contactNormal.normal().scalar(paintSettings.TANGENT_LINE_SCALAR)
-            var beginningOfLine: Vec2 = camera.convertToScreen(point.plus(line))
-            var endOfLine: Vec2 = camera.convertToScreen(point.minus(line))
-            g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
-            line = contact.contactNormal.scalar(paintSettings.NORMAL_LINE_SCALAR)
-            beginningOfLine = camera.convertToScreen(point.plus(line))
-            endOfLine = camera.convertToScreen(point.minus(line))
-            g.draw(Line2D.Double(beginningOfLine.x, beginningOfLine.y, endOfLine.x, endOfLine.y))
         }
     }
 }

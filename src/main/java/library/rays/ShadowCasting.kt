@@ -1,15 +1,11 @@
 package library.rays
 
-import demo.Camera
-import demo.ColourSettings
 import library.collision.Arbiter.Companion.isPointInside
 import library.dynamics.Body
 import library.geometry.Circle
 import library.geometry.Polygon
 import library.math.Mat2
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Path2D
 import kotlin.math.asin
 import kotlin.math.atan2
 
@@ -22,17 +18,9 @@ class ShadowCasting
  *
  * @param startPoint Origin of projecting rays.
  * @param distance   The desired distance to project the rays.
- */(private var startPoint: Vec2, private val distance: Int) {
-    /**
-     * Setter for start point.
-     *
-     * @param startPoint Returns start point.
-     */
-    fun setStartPoint(startPoint: Vec2) {
-        this.startPoint = startPoint
-    }
+ */(var startPoint: Vec2, private val distance: Int) {
 
-    private val rayData = ArrayList<RayAngleInformation>()
+    val rayData = ArrayList<RayAngleInformation>()
 
     /**
      * Updates the all projections in world space and acquires information about all intersecting rays.
@@ -85,34 +73,6 @@ class ShadowCasting
     }
 
     /**
-     * Debug draw method for all polygons generated and rays.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        for (i in rayData.indices) {
-            val ray1 = rayData[i].ray
-            val ray2 = rayData[if (i + 1 == rayData.size) 0 else i + 1].ray
-            g.color = paintSettings.shadow
-            val s = Path2D.Double()
-            val worldStartPoint = camera.convertToScreen(startPoint)
-            s.moveTo(worldStartPoint.x, worldStartPoint.y)
-            if (ray1.rayInformation != null) {
-                val point1 = camera.convertToScreen(ray1.rayInformation!!.coordinates)
-                s.lineTo(point1.x, point1.y)
-            }
-            if (ray2.rayInformation != null) {
-                val point2 = camera.convertToScreen(ray2.rayInformation!!.coordinates)
-                s.lineTo(point2.x, point2.y)
-            }
-            s.closePath()
-            g.fill(s)
-        }
-    }
-
-    /**
      * Getter for number of rays projected.
      *
      * @return Returns size of raydata.
@@ -124,7 +84,7 @@ class ShadowCasting
 /**
  * Ray information class to store relevant data about rays and any intersection found specific to shadow casting.
  */
-internal class RayAngleInformation
+class RayAngleInformation
 /**
  * Constructor to store ray information.
  *

@@ -1,7 +1,7 @@
 # KPhysics (based on [JPhysics](https://github.com/HaydenMarshalla/JPhysics))
-KPhysics is a Kotlin port of Hayden Marshalla's JPhysics. It is a 2D physics engine with zero third-party dependencies.
+KPhysics is an improved and extended version of Hayden Marshalla's JPhysics. It is a 2D physics engine with zero third-party dependencies.
 
-The engine is written in Kotlin and has been created with the intention of being used in games.
+It is written in Kotlin and is intended to be easily used in games programmed with Kotlin or Java.
 
 ## Tech demos
 

@@ -1,6 +1,5 @@
-package demo;
+package demo.window;
 
-import demo.window.TestBedWindow;
 import library.math.Vec2;
 
 public class Camera {

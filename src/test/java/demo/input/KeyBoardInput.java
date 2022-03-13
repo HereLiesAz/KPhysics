@@ -1,6 +1,6 @@
 package demo.input;
 
-import demo.ColourSettings;
+import demo.utils.ColourSettings;
 import demo.tests.Trebuchet;
 import demo.window.TestBedWindow;
 import library.dynamics.Settings;

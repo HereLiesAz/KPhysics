@@ -1,12 +1,7 @@
 package library.explosions
 
-import demo.Camera
-import demo.ColourSettings
 import library.dynamics.Body
 import library.math.Vec2
-import java.awt.Graphics2D
-import java.awt.geom.Ellipse2D
-import java.awt.geom.Line2D
 
 /**
  * Models proximity explosions.
@@ -17,7 +12,7 @@ class ProximityExplosion
  *
  * @param epicentre The epicentre of the explosion.
  * @param proximity    The proximity in which bodies are effected.
- */(private var epicentre: Vec2, private val proximity: Int) : Explosion {
+ */(private var epicentre: Vec2, val proximity: Int) : Explosion {
     /**
      * Sets the epicentre to a different coordinate.
      *
@@ -25,6 +20,10 @@ class ProximityExplosion
      */
     override fun setEpicentre(v: Vec2) {
         epicentre = v
+    }
+
+    fun getEpicentre(): Vec2 {
+        return epicentre
     }
 
     private var bodiesEffected = ArrayList<Body>()
@@ -44,51 +43,15 @@ class ProximityExplosion
         }
     }
 
-    private val linesToBodies = ArrayList<Vec2?>()
+    val linesToBodies = ArrayList<Vec2?>()
 
     /**
      * Updates the lines to body array for the debug drawer.
      */
-    private fun updateLinesToBody() {
+    fun updateLinesToBody() {
         linesToBodies.clear()
         for (b in bodiesEffected) {
             linesToBodies.add(b.position)
-        }
-    }
-
-    /**
-     * Debug draw method for proximity and effected objects.
-     *
-     * @param g             Graphics2D object to draw to
-     * @param paintSettings Colour settings to draw the objects to screen with
-     * @param camera        Camera class used to convert points from world space to view space
-     */
-    override fun draw(g: Graphics2D, paintSettings: ColourSettings, camera: Camera) {
-        g.color = paintSettings.proximity
-        val circlePotion = camera.convertToScreen(epicentre)
-        val proximityRadius = camera.scaleToScreenXValue(proximity.toDouble())
-        g.draw(
-            Ellipse2D.Double(
-                circlePotion.x - proximityRadius,
-                circlePotion.y - proximityRadius,
-                2 * proximityRadius,
-                2 * proximityRadius
-            )
-        )
-        updateLinesToBody()
-        for (p in linesToBodies) {
-            g.color = paintSettings.linesToObjects
-            val worldCoord = camera.convertToScreen(p)
-            g.draw(Line2D.Double(circlePotion.x, circlePotion.y, worldCoord.x, worldCoord.y))
-            val lineToRadius = camera.scaleToScreenXValue(paintSettings.CIRCLE_RADIUS.toDouble())
-            g.fill(
-                Ellipse2D.Double(
-                    worldCoord.x - lineToRadius,
-                    worldCoord.y - lineToRadius,
-                    2 * lineToRadius,
-                    2 * lineToRadius
-                )
-            )
         }
     }
 

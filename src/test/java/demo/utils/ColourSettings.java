@@ -1,4 +1,4 @@
-package demo;
+package demo.utils;
 
 import java.awt.*;
 
