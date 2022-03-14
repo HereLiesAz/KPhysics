@@ -1,6 +1,7 @@
 package de.chaffic.geometry
 
 import de.chaffic.collision.AxisAlignedBoundingBox
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
 import de.chaffic.math.Vec2
 
 /**
@@ -77,6 +78,8 @@ class Polygon : Shape {
      * @param density The desired density to factor into the calculation.
      */
     override fun calcMass(density: Double) {
+        val physicalBody = this.body
+        if(physicalBody !is PhysicalBodyInterface) return
         var centroidDistVec: Vec2? = Vec2(0.0, 0.0)
         var area = 0.0
         var inertia = 0.0
@@ -98,10 +101,10 @@ class Polygon : Shape {
         for (i in vertices.indices) {
             vertices[i] = vertices[i].minus(centroidDistVec)
         }
-        body.mass = density * area
-        body.invMass = if (body.mass != 0.0) 1.0 / body.mass else 0.0
-        body.inertia = inertia * density
-        body.invInertia = if (body.inertia != 0.0) 1.0 / body.inertia else 0.0
+        physicalBody.mass = density * area
+        physicalBody.invMass = if (physicalBody.mass != 0.0) 1.0 / physicalBody.mass else 0.0
+        physicalBody.inertia = inertia * density
+        physicalBody.invInertia = if (physicalBody.inertia != 0.0) 1.0 / physicalBody.inertia else 0.0
     }
 
     /**
@@ -128,7 +131,7 @@ class Polygon : Shape {
                 maxY = py
             }
         }
-        body.aabb = AxisAlignedBoundingBox(Vec2(minX, minY), Vec2(maxX, maxY))
+        this.body.aabb = AxisAlignedBoundingBox(Vec2(minX, minY), Vec2(maxX, maxY))
     }
 
     /**
@@ -190,14 +193,14 @@ class Polygon : Shape {
     override fun isPointInside(startPoint: Vec2): Boolean {
         for (i in vertices.indices) {
             val objectPoint = startPoint.minus(
-                body.position.plus(
-                    body.shape.orientation.mul(
+                this.body.position.plus(
+                    this.body.shape.orientation.mul(
                         vertices[i],
                         Vec2()
                     )
                 )
             )
-            if (objectPoint.dot(body.shape.orientation.mul(normals[i], Vec2())) > 0) {
+            if (objectPoint.dot(this.body.shape.orientation.mul(normals[i], Vec2())) > 0) {
                 return false
             }
         }

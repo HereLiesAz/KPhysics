@@ -1,6 +1,7 @@
 package de.chaffic.geometry
 
 import de.chaffic.collision.AxisAlignedBoundingBox
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
 import de.chaffic.math.Vec2
 
 /**
@@ -18,17 +19,19 @@ class Circle
      * @param density The desired density to factor into the calculation.
      */
     override fun calcMass(density: Double) {
-        body.mass = StrictMath.PI * radius * radius * density
-        body.invMass = if (body.mass != 0.0) 1.0f / body.mass else 0.0
-        body.inertia = body.mass * radius * radius
-        body.invInertia = if (body.inertia != 0.0) 1.0f / body.inertia else 0.0
+        val physicalBody = this.body
+        if(physicalBody !is PhysicalBodyInterface) return
+        physicalBody.mass = StrictMath.PI * radius * radius * density
+        physicalBody.invMass = if (physicalBody.mass != 0.0) 1.0f / physicalBody.mass else 0.0
+        physicalBody.inertia = physicalBody.mass * radius * radius
+        physicalBody.invInertia = if (physicalBody.inertia != 0.0) 1.0f / physicalBody.inertia else 0.0
     }
 
     /**
      * Generates an AABB and binds it to the body.
      */
     override fun createAABB() {
-        body.aabb = AxisAlignedBoundingBox(Vec2(-radius, -radius), Vec2(radius, radius))
+        this.body.aabb = AxisAlignedBoundingBox(Vec2(-radius, -radius), Vec2(radius, radius))
     }
 
     /**
@@ -38,7 +41,7 @@ class Circle
      * @return boolean value whether the point is inside the first body.
      */
     override fun isPointInside(startPoint: Vec2): Boolean {
-        val d = body.position.minus(startPoint)
+        val d = this.body.position.minus(startPoint)
         return d.length() <= radius
     }
 }

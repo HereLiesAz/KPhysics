@@ -1,14 +1,14 @@
 package de.chaffic.geometry
 
-import de.chaffic.dynamics.Body
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 
 /**
  * Abstract class presenting a geometric shape.
  */
-abstract class Shape internal constructor() {
-    lateinit var body: Body
+abstract class Shape {
+    lateinit var body: CollisionBodyInterface
     var orientation: Mat2 = Mat2()
 
     /**
