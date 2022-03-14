@@ -1,8 +1,9 @@
 package de.chaffic.rays
 
-import de.chaffic.dynamics.Body
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.geometry.Circle
 import de.chaffic.geometry.Polygon
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 import kotlin.math.sqrt
 
@@ -67,7 +68,7 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      *
      * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
      */
-    fun updateProjection(bodiesToEvaluate: ArrayList<Body>) {
+    fun updateProjection(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         rayInformation = null
         val endPoint = direction.scalar(distance.toDouble())
         val endX = endPoint.x
@@ -76,8 +77,9 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
         var minPx = 0.0
         var minPy = 0.0
         var intersectionFound = false
-        var closestBody: Body? = null
+        var closestBody: TranslatableBody? = null
         for (B in bodiesToEvaluate) {
+            if(B !is CollisionBodyInterface) continue
             if (B.shape is Polygon) {
                 val poly = B.shape as Polygon
                 for (i in poly.vertices.indices) {

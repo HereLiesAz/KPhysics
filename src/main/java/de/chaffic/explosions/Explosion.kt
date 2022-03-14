@@ -1,6 +1,6 @@
 package de.chaffic.explosions
 
-import de.chaffic.dynamics.Body
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 
 /**
@@ -19,7 +19,7 @@ interface Explosion {
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    fun update(bodiesToEvaluate: ArrayList<Body>)
+    fun update(bodiesToEvaluate: ArrayList<TranslatableBody>)
 
     /**
      * Sets the epicentre to a different coordinate.

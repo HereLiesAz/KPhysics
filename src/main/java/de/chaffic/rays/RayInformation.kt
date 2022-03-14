@@ -1,6 +1,6 @@
 package de.chaffic.rays
 
-import de.chaffic.dynamics.Body
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 
 /**
@@ -12,7 +12,7 @@ class RayInformation {
      *
      * @return returns b variable of type Body.
      */
-    val b: Body
+    val b: TranslatableBody
 
     /**
      * Getter for coords variable.
@@ -37,7 +37,7 @@ class RayInformation {
      * @param y     y position of intersection.
      * @param index Index of shapes side that intersection intersects.
      */
-    constructor(b: Body, x: Double, y: Double, index: Int) {
+    constructor(b: TranslatableBody, x: Double, y: Double, index: Int) {
         this.b = b
         coordinates = Vec2(x, y)
         this.index = index
@@ -51,7 +51,7 @@ class RayInformation {
      * @param v     x/y position of intersection.
      * @param index Index of shapes side that intersection intersects.
      */
-    constructor(b: Body, v: Vec2, index: Int) {
+    constructor(b: TranslatableBody, v: Vec2, index: Int) {
         this.b = b
         coordinates = v.copy()
         this.index = index

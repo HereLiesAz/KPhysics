@@ -1,6 +1,10 @@
 package de.chaffic.dynamics
 
+import de.chaffic.collision.Arbiter
 import de.chaffic.collision.AxisAlignedBoundingBox
+import de.chaffic.collision.bodies.CollisionBodyInterface
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.joints.Joint
 import de.chaffic.math.Vec2
 import kotlin.math.pow
@@ -12,7 +16,7 @@ import kotlin.math.pow
  */
 class World(var gravity: Vec2 = Vec2()) {
 
-    var bodies = ArrayList<Body>()
+    var bodies = ArrayList<TranslatableBody>()
 
     /**
      * Adds a body to the world
@@ -20,8 +24,9 @@ class World(var gravity: Vec2 = Vec2()) {
      * @param b Body to add.
      * @return Returns the newly added body.
      */
-    fun addBody(b: Body): Body {
-        bodies.add(b)
+    fun <T> addBody(b: T): T {
+        if(b !is TranslatableBody) throw IllegalArgumentException("Not a translatable body")
+        bodies.add(b as TranslatableBody)
         return b
     }
 
@@ -30,7 +35,7 @@ class World(var gravity: Vec2 = Vec2()) {
      *
      * @param b The body to remove from the world.
      */
-    fun removeBody(b: Body) {
+    fun removeBody(b: TranslatableBody) {
         bodies.remove(b)
     }
 
@@ -57,7 +62,7 @@ class World(var gravity: Vec2 = Vec2()) {
         joints.remove(j)
     }
 
-    var contacts = ArrayList<de.chaffic.collision.Arbiter>()
+    var contacts = ArrayList<Arbiter>()
 
     /**
      * The main time step method for the world to conduct an iteration of the current world call this method with a desired time step value.
@@ -87,11 +92,14 @@ class World(var gravity: Vec2 = Vec2()) {
 
         //Integrate positions
         for (b in bodies) {
+            if(b !is PhysicalBodyInterface) continue
             if (b.invMass == 0.0) {
                 continue
             }
             b.position.add(b.velocity.scalar(dt))
-            b.orientation = b.orientation + dt * b.angularVelocity
+            if(b is CollisionBodyInterface) {
+                b.orientation = b.orientation + dt * b.angularVelocity
+            }
             b.force[0.0] = 0.0
             b.torque = 0.0
         }
@@ -104,6 +112,7 @@ class World(var gravity: Vec2 = Vec2()) {
      */
     private fun applyForces(dt: Double) {
         for (b in bodies) {
+            if(b !is PhysicalBodyInterface) continue
             if (b.invMass == 0.0) {
                 continue
             }
@@ -144,7 +153,7 @@ class World(var gravity: Vec2 = Vec2()) {
      *
      * @param b Body to apply drag to.
      */
-    private fun applyLinearDrag(b: Body?) {
+    private fun applyLinearDrag(b: PhysicalBodyInterface?) {
         val velocityMagnitude = b!!.velocity.length()
         val dragForceMagnitude = velocityMagnitude * velocityMagnitude * b.linearDampening
         val dragForceVector = b.velocity.normalized.scalar(-dragForceMagnitude)
@@ -159,9 +168,10 @@ class World(var gravity: Vec2 = Vec2()) {
             val a = bodies[i]
             for (x in i + 1 until bodies.size) {
                 val b = bodies[x]
+                if(a !is CollisionBodyInterface || b !is CollisionBodyInterface) continue
 
                 //Ignores static or particle objects
-                if (a.invMass == 0.0 && b.invMass == 0.0 || a.particle && b.particle) {
+                if (a is PhysicalBodyInterface && b is PhysicalBodyInterface && (a.invMass == 0.0 && b.invMass == 0.0 || a.particle && b.particle)) {
                     continue
                 }
                 if (AxisAlignedBoundingBox.aabbOverlap(a, b)) {
@@ -178,8 +188,8 @@ class World(var gravity: Vec2 = Vec2()) {
      * @param a
      * @param b
      */
-    private fun narrowPhaseCheck(a: Body, b: Body) {
-        val contactQuery = de.chaffic.collision.Arbiter(a, b)
+    private fun narrowPhaseCheck(a: CollisionBodyInterface, b: CollisionBodyInterface) {
+        val contactQuery = Arbiter(a, b)
         contactQuery.narrowPhase()
         if (contactQuery.contactCount > 0) {
             contacts.add(contactQuery)
@@ -203,6 +213,7 @@ class World(var gravity: Vec2 = Vec2()) {
             val bodyA = bodies[a]
             for (b in a + 1 until bodies.size) {
                 val bodyB = bodies[b]
+                if(bodyB !is PhysicalBodyInterface || bodyA !is PhysicalBodyInterface) continue
                 val distance = bodyA.position.distance(bodyB.position)
                 val force = 6.67.pow(-11.0) * bodyA.mass * bodyB.mass / (distance * distance)
                 var direction: Vec2? = Vec2(bodyB.position.x - bodyA.position.x, bodyB.position.y - bodyA.position.y)

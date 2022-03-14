@@ -1,9 +1,10 @@
 package de.chaffic.rays
 
 import de.chaffic.collision.Arbiter.Companion.isPointInside
-import de.chaffic.dynamics.Body
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.geometry.Circle
 import de.chaffic.geometry.Polygon
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 import kotlin.math.asin
@@ -27,9 +28,11 @@ class ShadowCasting
      *
      * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
      */
-    fun updateProjections(bodiesToEvaluate: ArrayList<Body>) {
+    fun updateProjections(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         rayData.clear()
         for (B in bodiesToEvaluate) {
+            if(B !is CollisionBodyInterface) continue
+
             if (isPointInside(B, startPoint)) {
                 rayData.clear()
                 break
@@ -61,7 +64,7 @@ class ShadowCasting
      * @param direction        Direction of ray to project.
      * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
      */
-    private fun projectRays(direction: Vec2, bodiesToEvaluate: ArrayList<Body>) {
+    private fun projectRays(direction: Vec2, bodiesToEvaluate: ArrayList<TranslatableBody>) {
         val m = Mat2(0.001)
         m.transpose().mul(direction)
         for (i in 0..2) {

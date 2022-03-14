@@ -1,6 +1,6 @@
 package de.chaffic.collision
 
-import de.chaffic.dynamics.Body
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.math.Vec2
 
 /**
@@ -107,7 +107,7 @@ class AxisAlignedBoundingBox(min: Vec2 = Vec2(), max: Vec2 = Vec2()) {
          * @return Boolean value of whether the two bodies AABB's overlap in world space.
          */
         @JvmStatic
-        fun aabbOverlap(bodyA: Body, bodyB: Body): Boolean {
+        fun aabbOverlap(bodyA: CollisionBodyInterface, bodyB: CollisionBodyInterface): Boolean {
             val aCopy = bodyA.aabb.copy()
             val bCopy = bodyB.aabb.copy()
             aCopy.addOffset(bodyA.position)

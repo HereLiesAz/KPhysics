@@ -1,6 +1,7 @@
 package de.chaffic.explosions
 
-import de.chaffic.dynamics.Body
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 import de.chaffic.rays.RayInformation
 
@@ -12,7 +13,7 @@ import de.chaffic.rays.RayInformation
  * @param distance    Distance of projected rays.
  * @param worldBodies The world the rays effect and are projected in.
  */
-class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<Body>) : Explosion {
+class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<TranslatableBody>) : Explosion {
     val rayScatter: RayScatter
 
     /**
@@ -37,7 +38,7 @@ class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodie
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    override fun update(bodiesToEvaluate: ArrayList<Body>) {
+    override fun update(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         raysInContact.clear()
         rayScatter.updateRays(bodiesToEvaluate)
         val rayArray = rayScatter.rays
@@ -62,6 +63,7 @@ class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodie
             val invDistance = 1 / distance
             val impulseMag = blastDir.normalize().scalar(blastPower * invDistance)
             val b = ray.b
+            if(b !is PhysicalBodyInterface) continue
             b.applyLinearImpulse(impulseMag, ray.coordinates.minus(b.position))
         }
     }

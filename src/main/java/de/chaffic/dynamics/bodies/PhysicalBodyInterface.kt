@@ -1,10 +1,10 @@
 package de.chaffic.dynamics.bodies
 
-import de.chaffic.geometry.interfaces.Translatable
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 
 interface PhysicalBodyInterface :
-    Translatable {
+    TranslatableBody {
     override var position: Vec2
     var velocity: Vec2
     var force: Vec2

@@ -1,6 +1,7 @@
 package de.chaffic.explosions
 
-import de.chaffic.dynamics.Body
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 
 /**
@@ -26,14 +27,14 @@ class ProximityExplosion
         return epicentre
     }
 
-    private var bodiesEffected = ArrayList<Body>()
+    private var bodiesEffected = ArrayList<TranslatableBody>()
 
     /**
      * Updates the arraylist to reevaluate what bodies are effected/within the proximity.
      *
      * @param bodiesToEvaluate Arraylist of bodies in the world to check.
      */
-    override fun update(bodiesToEvaluate: ArrayList<Body>) {
+    override fun update(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         bodiesEffected.clear()
         for (b in bodiesToEvaluate) {
             val blastDist = b.position.minus(epicentre)
@@ -62,6 +63,8 @@ class ProximityExplosion
      */
     override fun applyBlastImpulse(blastPower: Double) {
         for (b in bodiesEffected) {
+            if(b !is PhysicalBodyInterface) continue
+
             val blastDir = b.position.minus(epicentre)
             val distance = blastDir.length()
             if (distance == 0.0) return

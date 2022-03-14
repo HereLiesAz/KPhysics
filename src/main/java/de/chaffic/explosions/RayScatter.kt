@@ -1,6 +1,6 @@
 package de.chaffic.explosions
 
-import de.chaffic.dynamics.Body
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 import de.chaffic.rays.Ray
@@ -43,7 +43,7 @@ class RayScatter(epicentre: Vec2, private val noOfRays: Int) {
      *
      * @param worldBodies Arraylist of all bodies to update ray projections for.
      */
-    fun updateRays(worldBodies: ArrayList<Body>) {
+    fun updateRays(worldBodies: ArrayList<TranslatableBody>) {
         for (ray in rays) {
             ray.updateProjection(worldBodies)
         }

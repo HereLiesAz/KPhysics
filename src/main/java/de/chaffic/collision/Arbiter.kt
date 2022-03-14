@@ -1,9 +1,11 @@
 package de.chaffic.collision
 
-import de.chaffic.dynamics.Body
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.dynamics.Physics
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
 import de.chaffic.geometry.Circle
 import de.chaffic.geometry.Polygon
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 
 /**
@@ -15,24 +17,31 @@ class Arbiter(
      *
      * @return Body A
      */
-    val a: Body,
+    val a: TranslatableBody,
     /**
      * Getter for Body B.
      *
      * @return Body B
      */
-    val b: Body
+    val b: TranslatableBody
 ) {
 
     /**
      * Static fiction constant to be set during the construction of the arbiter.
      */
-    var staticFriction: Double = (a.staticFriction + b.staticFriction) / 2
+    private var staticFriction = .0
 
     /**
      * Dynamic fiction constant to be set during the construction of the arbiter.
      */
-    private var dynamicFriction: Double = (a.dynamicFriction + b.dynamicFriction) / 2
+    private var dynamicFriction = .0
+
+    init {
+        if(a is CollisionBodyInterface && b is CollisionBodyInterface) {
+            staticFriction = (a.staticFriction + b.staticFriction) / 2
+            dynamicFriction = (a.dynamicFriction + b.dynamicFriction) / 2
+        }
+    }
 
     /**
      * Array to save the contact points of the objects body's in world space.
@@ -46,9 +55,13 @@ class Arbiter(
      * Conducts a narrow phase detection and creates a contact manifold.
      */
     fun narrowPhase() {
-        restitution = a.restitution.coerceAtMost(b.restitution)
+        if(a !is CollisionBodyInterface || b !is CollisionBodyInterface) return
+
+        if(a is PhysicalBodyInterface && b is PhysicalBodyInterface) {
+            restitution = a.restitution.coerceAtMost(b.restitution)
+        }
         if (a.shape is Circle && b.shape is Circle) {
-            circleCircleCollision()
+            circleCircleCollision(a, b)
         } else if (a.shape is Circle && b.shape is Polygon) {
             circlePolygonCollision(a, b)
         } else if (a.shape is Polygon && b.shape is Circle) {
@@ -57,7 +70,7 @@ class Arbiter(
                 contactNormal.unaryMinus()
             }
         } else if (a.shape is Polygon && b.shape is Polygon) {
-            polygonPolygonCollision()
+            polygonPolygonCollision(a, b)
         }
     }
 
@@ -66,7 +79,7 @@ class Arbiter(
     /**
      * Circle vs circle collision detection method
      */
-    private fun circleCircleCollision() {
+    private fun circleCircleCollision(a: CollisionBodyInterface, b: CollisionBodyInterface) {
         val ca = a.shape as Circle
         val cb = b.shape as Circle
         val normal = b.position.minus(a.position)
@@ -94,7 +107,7 @@ class Arbiter(
      * @param circleBody Circle object
      * @param polygonBody Polygon Object
      */
-    private fun circlePolygonCollision(circleBody: Body, polygonBody: Body) {
+    private fun circlePolygonCollision(circleBody: CollisionBodyInterface, polygonBody: CollisionBodyInterface) {
         val circle = circleBody.shape as Circle
         val polygon = polygonBody.shape as Polygon
 
@@ -174,15 +187,15 @@ class Arbiter(
     /**
      * Polygon collision check
      */
-    private fun polygonPolygonCollision() {
+    private fun polygonPolygonCollision(a: CollisionBodyInterface, b: CollisionBodyInterface) {
         val pa = a.shape as Polygon
         val pb = b.shape as Polygon
-        val aData = de.chaffic.collision.AxisData()
+        val aData = AxisData()
         findAxisOfMinPenetration(aData, pa, pb)
         if (aData.penetration >= 0) {
             return
         }
-        val bData = de.chaffic.collision.AxisData()
+        val bData = AxisData()
         findAxisOfMinPenetration(bData, pb, pa)
         if (bData.penetration >= 0) {
             return
@@ -191,7 +204,7 @@ class Arbiter(
         val referencePoly: Polygon
         val incidentPoly: Polygon
         val flip: Boolean
-        if (de.chaffic.collision.Arbiter.Companion.selectionBias(aData.penetration, bData.penetration)) {
+        if (selectionBias(aData.penetration, bData.penetration)) {
             referencePoly = pa
             incidentPoly = pb
             referenceFaceIndex = aData.referenceFaceIndex
@@ -313,7 +326,7 @@ class Arbiter(
      * @param A    Polygon A to test.
      * @param B    Polygon B to test.
      */
-    private fun findAxisOfMinPenetration(data: de.chaffic.collision.AxisData, A: Polygon, B: Polygon) {
+    private fun findAxisOfMinPenetration(data: AxisData, A: Polygon, B: Polygon) {
         var distance = -Double.MAX_VALUE
         var bestIndex = 0
         for (i in A.vertices.indices) {
@@ -365,6 +378,9 @@ class Arbiter(
         if (penetrationTolerance <= 0.0) {
             return
         }
+
+        if(a !is PhysicalBodyInterface || b !is PhysicalBodyInterface) return
+
         val totalMass = a.mass + b.mass
         val correction = penetrationTolerance * Physics.PENETRATION_CORRECTION / totalMass
         a.position = a.position.plus(contactNormal.scalar(-a.mass * correction))
@@ -377,6 +393,8 @@ class Arbiter(
     fun solve() {
         val contactA = contacts[0].minus(a.position)
         val contactB = contacts[0].minus(b.position)
+
+        if(a !is PhysicalBodyInterface || b !is PhysicalBodyInterface) return
 
         //Relative velocity created from equation found in GDC talk of box2D lite.
         var relativeVel = b.velocity.plus(contactB.cross(b.angularVelocity)).minus(a.velocity).minus(
@@ -428,7 +446,7 @@ class Arbiter(
          * @return boolean value whether the point is inside the first body.
          */
         @JvmStatic
-        fun isPointInside(b: Body, startPoint: Vec2): Boolean {
+        fun isPointInside(b: CollisionBodyInterface, startPoint: Vec2): Boolean {
             return b.shape.isPointInside(startPoint)
         }
 

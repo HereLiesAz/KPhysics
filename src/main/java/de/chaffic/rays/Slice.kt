@@ -1,9 +1,12 @@
 package de.chaffic.rays
 
+import de.chaffic.collision.bodies.CollisionBodyInterface
 import de.chaffic.dynamics.Body
 import de.chaffic.dynamics.World
+import de.chaffic.dynamics.bodies.PhysicalBodyInterface
 import de.chaffic.geometry.Circle
 import de.chaffic.geometry.Polygon
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
 import kotlin.math.sqrt
 
@@ -34,7 +37,7 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
      *
      * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
      */
-    fun updateProjection(bodiesToEvaluate: ArrayList<Body>) {
+    fun updateProjection(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         intersectingBodiesInfo.clear()
         val endPoint = direction.scalar(distance)
         val endX = endPoint.x
@@ -43,6 +46,7 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
         var minPy: Double
         var noOfIntersections = 0
         for (body in bodiesToEvaluate) {
+            if(body !is CollisionBodyInterface) continue
             if (body.shape is Polygon) {
                 val poly = body.shape as Polygon
                 for (i in poly.vertices.indices) {
@@ -113,6 +117,7 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
         var i = 0
         while (i < intersectingBodiesInfo.size - k) {
             val b = intersectingBodiesInfo[i].b
+            if(b !is CollisionBodyInterface || b !is PhysicalBodyInterface) continue
             val isStatic = b.mass == 0.0
             if (b.shape is Polygon) {
                 val p = b.shape as Polygon
@@ -122,7 +127,7 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
                 val secondIndex = intersection2.index
                 val obj2firstIndex = obj1firstIndex
                 var totalVerticesObj1 = obj1firstIndex + 2 + (p.vertices.size - secondIndex)
-                val obj1Vertz = arrayOfNulls<Vec2>(totalVerticesObj1)
+                val obj1Vertz = MutableList(totalVerticesObj1){Vec2()}
                 for (x in 0 until obj1firstIndex + 1) {
                     obj1Vertz[x] = b.shape.orientation.mul(p.vertices[x], Vec2()).plus(b.position)
                 }
@@ -132,11 +137,11 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
                     obj1Vertz[++obj1firstIndex] = b.shape.orientation.mul(p.vertices[x], Vec2()).plus(b.position)
                 }
                 var polyCentre = findPolyCentre(obj1Vertz)
-                val b1 = Body(Polygon(obj1Vertz.filterNotNull().toTypedArray()), polyCentre.x, polyCentre.y)
+                val b1 = Body(Polygon(obj1Vertz.toList().toTypedArray()), polyCentre.x, polyCentre.y)
                 if (isStatic) b1.density = .0
                 world.addBody(b1)
                 totalVerticesObj1 = secondIndex - obj2firstIndex + 2
-                val obj2Vertz = arrayOfNulls<Vec2>(totalVerticesObj1)
+                val obj2Vertz = MutableList(totalVerticesObj1){Vec2()}
                 var indexToAddTo = 0
                 obj2Vertz[indexToAddTo++] = intersection1.coordinates
                 for (x in obj2firstIndex + 1..secondIndex) {
@@ -144,7 +149,7 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
                 }
                 obj2Vertz[totalVerticesObj1 - 1] = intersection2.coordinates
                 polyCentre = findPolyCentre(obj2Vertz)
-                val b2 = Body(Polygon(obj2Vertz.filterNotNull().toTypedArray()), polyCentre.x, polyCentre.y)
+                val b2 = Body(Polygon(obj2Vertz.toList().toTypedArray()), polyCentre.x, polyCentre.y)
                 if (isStatic) b2.density = .0
                 world.addBody(b2)
             }
@@ -159,17 +164,17 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
      * @param obj2Vertz Vertices of polygon to find center of mass of.
      * @return Center of mass of type Vec2.
      */
-    private fun findPolyCentre(obj2Vertz: Array<Vec2?>): Vec2 {
+    private fun findPolyCentre(obj2Vertz: MutableList<Vec2>): Vec2 {
         var accumulatedArea = 0.0
         var centerX = 0.0
         var centerY = 0.0
         var i = 0
         var j = obj2Vertz.size - 1
         while (i < obj2Vertz.size) {
-            val temp = obj2Vertz[i]!!.x * obj2Vertz[j]!!.y - obj2Vertz[j]!!.x * obj2Vertz[i]!!.y
+            val temp = obj2Vertz[i].x * obj2Vertz[j].y - obj2Vertz[j].x * obj2Vertz[i].y
             accumulatedArea += temp
-            centerX += (obj2Vertz[i]!!.x + obj2Vertz[j]!!.x) * temp
-            centerY += (obj2Vertz[i]!!.y + obj2Vertz[j]!!.y) * temp
+            centerX += (obj2Vertz[i].x + obj2Vertz[j].x) * temp
+            centerY += (obj2Vertz[i].y + obj2Vertz[j].y) * temp
             j = i++
         }
         if (accumulatedArea == 0.0) return Vec2()
