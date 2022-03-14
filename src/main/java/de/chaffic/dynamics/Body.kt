@@ -13,7 +13,7 @@ import de.chaffic.math.Vec2
  * @param x     Position x in world space.
  * @param y     Position y in world space.
  */
-class Body(override var shape: Shape, x: Double, y: Double): AbstractPhysicalBody(x, y), CollisionBodyInterface {
+class Body(override var shape: Shape, x: Double, y: Double): AbstractPhysicalBody(), CollisionBodyInterface {
     override var position: Vec2 = Vec2(x, y)
     override var dynamicFriction = .2
     override var staticFriction = .5

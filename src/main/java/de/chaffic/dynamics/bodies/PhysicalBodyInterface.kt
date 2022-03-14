@@ -5,7 +5,6 @@ import de.chaffic.math.Vec2
 
 interface PhysicalBodyInterface :
     TranslatableBody {
-    override var position: Vec2
     var velocity: Vec2
     var force: Vec2
     var angularVelocity: Double
