@@ -2,6 +2,9 @@ package de.chaffic.geometry
 
 import de.chaffic.collision.AxisAlignedBoundingBox
 import de.chaffic.dynamics.bodies.PhysicalBodyInterface
+import de.chaffic.geometry.bodies.TranslatableBody
+import de.chaffic.math.Math.lineIntersect
+import de.chaffic.math.Math.pointIsOnLine
 import de.chaffic.math.Vec2
 
 /**
@@ -205,5 +208,34 @@ class Polygon : Shape {
             }
         }
         return true
+    }
+
+    override fun rayIntersect(startPoint: Vec2, endPoint: Vec2, maxDistance: Double, rayLength: Double): IntersectionReturnElement {
+        var minPx = 0.0
+        var minPy = 0.0
+        var intersectionFound = false
+        var closestBody: TranslatableBody? = null
+        var maxD = maxDistance
+
+        for (i in vertices.indices) {
+            var startOfPolyEdge = vertices[i]
+            var endOfPolyEdge = vertices[if (i + 1 == vertices.size) 0 else i + 1]
+            startOfPolyEdge = orientation.mul(startOfPolyEdge, Vec2()).plus(body.position)
+            endOfPolyEdge = orientation.mul(endOfPolyEdge, Vec2()).plus(body.position)
+
+            //detect if line (startPoint -> endpoint) intersects with the current edge (startOfPolyEdge -> endOfPolyEdge)
+            val intersection = lineIntersect(startPoint, endPoint, startOfPolyEdge, endOfPolyEdge)
+            if (intersection != null) {
+                val distance = startPoint.distance(intersection)
+                if(pointIsOnLine(startPoint, endPoint, intersection) && pointIsOnLine(startOfPolyEdge, endOfPolyEdge, intersection) && distance < maxD) {
+                    maxD = distance
+                    minPx = intersection.x
+                    minPy = intersection.y
+                    intersectionFound = true
+                    closestBody = body
+                }
+            }
+        }
+        return IntersectionReturnElement(minPx, minPy, intersectionFound, closestBody, maxD)
     }
 }

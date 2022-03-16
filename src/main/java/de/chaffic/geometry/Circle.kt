@@ -2,7 +2,9 @@ package de.chaffic.geometry
 
 import de.chaffic.collision.AxisAlignedBoundingBox
 import de.chaffic.dynamics.bodies.PhysicalBodyInterface
+import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
+import kotlin.math.sqrt
 
 /**
  * Circle class to create a circle object.
@@ -43,5 +45,36 @@ class Circle
     override fun isPointInside(startPoint: Vec2): Boolean {
         val d = this.body.position.minus(startPoint)
         return d.length() <= radius
+    }
+
+    override fun rayIntersect(startPoint: Vec2, endPoint: Vec2, maxDistance: Double, rayLength: Double): IntersectionReturnElement {
+        var minPx = 0.0
+        var minPy = 0.0
+        var intersectionFound = false
+        var closestBody: TranslatableBody? = null
+        var maxD = maxDistance
+
+        val ray = endPoint.copy().minus(startPoint)
+        val circleCenter = body.position.copy()
+        val r = radius
+        val difInCenters = startPoint.minus(circleCenter)
+        val a = ray.dot(ray)
+        val b = 2 * difInCenters.dot(ray)
+        val c = difInCenters.dot(difInCenters) - r * r
+        var discriminant = b * b - 4 * a * c
+        if (discriminant >= 0) {
+            discriminant = sqrt(discriminant)
+            val t1 = (-b - discriminant) / (2 * a)
+            if (t1 in 0.0..1.0) {
+                if (t1 < maxDistance) {
+                    maxD = t1
+                    minPx = startPoint.x + endPoint.x * t1
+                    minPy = startPoint.y + endPoint.y * t1
+                    intersectionFound = true
+                    closestBody = body
+                }
+            }
+        }
+        return IntersectionReturnElement(minPx, minPy, intersectionFound, closestBody, maxD)
     }
 }

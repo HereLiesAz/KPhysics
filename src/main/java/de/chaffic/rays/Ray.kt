@@ -1,11 +1,8 @@
 package de.chaffic.rays
 
 import de.chaffic.collision.bodies.CollisionBodyInterface
-import de.chaffic.geometry.Circle
-import de.chaffic.geometry.Polygon
 import de.chaffic.geometry.bodies.TranslatableBody
 import de.chaffic.math.Vec2
-import kotlin.math.sqrt
 
 /**
  * Ray class to define and project rays in a world.
@@ -14,8 +11,8 @@ import kotlin.math.sqrt
  * @param direction  The direction of the ray points in radians.
  * @param distance   The distance the ray is projected
  */
-class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
-    val distance: Int
+class Ray(var startPoint: Vec2, direction: Vec2, distance: Double) {
+    val distance: Double
     /**
      * Gets the direction of the ray in radians.
      *
@@ -30,7 +27,7 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      * @param direction The direction of the ray points in radians.
      * @param distance  The distance the ray is projected
      */
-    constructor(direction: Double, distance: Int) : this(Vec2(), Vec2(direction), distance)
+    constructor(direction: Double, distance: Double) : this(Vec2(), Vec2(direction), distance)
 
     /**
      * Convenience constructor with ray set at origin. Similar to
@@ -39,7 +36,7 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      * @param direction The direction of the ray points.
      * @param distance  The distance the ray is projected
      */
-    constructor(direction: Vec2, distance: Int) : this(Vec2(), direction, distance)
+    constructor(direction: Vec2, distance: Double) : this(Vec2(), direction, distance)
 
     /**
      * Convenience constructor. Similar to
@@ -49,7 +46,7 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      * @param direction  The direction of the ray points in radians.
      * @param distance   The distance the ray is projected
      */
-    constructor(startPoint: Vec2, direction: Double, distance: Int) : this(
+    constructor(startPoint: Vec2, direction: Double, distance: Double) : this(
         startPoint,
         Vec2(direction),
         distance
@@ -70,67 +67,22 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      */
     fun updateProjection(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         rayInformation = null
-        val endPoint = direction.scalar(distance.toDouble()) + startPoint
-        val endX = endPoint.x
-        val endY = endPoint.y
+        val endPoint = direction.scalar(distance).plus(startPoint)
         var minT1 = Double.POSITIVE_INFINITY
         var minPx = 0.0
         var minPy = 0.0
         var intersectionFound = false
         var closestBody: TranslatableBody? = null
-        for (B in bodiesToEvaluate) {
-            if(B !is CollisionBodyInterface) continue
-            if (B.shape is Polygon) {
-                val poly = B.shape as Polygon
-                for (i in poly.vertices.indices) {
-                    var startOfPolyEdge = poly.vertices[i]
-                    var endOfPolyEdge = poly.vertices[if (i + 1 == poly.vertices.size) 0 else i + 1]
-                    startOfPolyEdge = poly.orientation.mul(startOfPolyEdge, Vec2()).plus(B.position)
-                    endOfPolyEdge = poly.orientation.mul(endOfPolyEdge, Vec2()).plus(B.position)
-                    val dx = endOfPolyEdge.x - startOfPolyEdge.x
-                    val dy = endOfPolyEdge.y - startOfPolyEdge.y
-
-                    //Check to see if the lines are not parallel
-                    if (dx - endX != 0.0 && dy - endY != 0.0) {
-                        val t2 =
-                            (endX * (startOfPolyEdge.y - startPoint.y) + endY * (startPoint.x - startOfPolyEdge.x)) / (dx * endY - dy * endX)
-                        val t1 = (startOfPolyEdge.x + dx * t2 - startPoint.x) / endX
-                        if (t1 > 0 && t2 >= 0 && t2 <= 1.0) {
-                            val point = Vec2(startPoint.x + endX * t1, startPoint.y + endY * t1)
-                            val dist = point.minus(startPoint).length()
-                            if (t1 < minT1 && dist < distance) {
-                                minT1 = t1
-                                minPx = point.x
-                                minPy = point.y
-                                intersectionFound = true
-                                closestBody = B
-                            }
-                        }
-                    }
-                }
-            } else if (B.shape is Circle) {
-                val circle = B.shape as Circle
-                val ray = endPoint.copy()
-                val circleCenter = B.position.copy()
-                val r = circle.radius
-                val difInCenters = startPoint.minus(circleCenter)
-                val a = ray.dot(ray)
-                val b = 2 * difInCenters.dot(ray)
-                val c = difInCenters.dot(difInCenters) - r * r
-                var discriminant = b * b - 4 * a * c
-                if (discriminant >= 0) {
-                    discriminant = sqrt(discriminant)
-                    val t1 = (-b - discriminant) / (2 * a)
-                    if (t1 in 0.0..1.0) {
-                        if (t1 < minT1) {
-                            minT1 = t1
-                            minPx = startPoint.x + endX * t1
-                            minPy = startPoint.y + endY * t1
-                            intersectionFound = true
-                            closestBody = B
-                        }
-                    }
-                }
+        for (body in bodiesToEvaluate) {
+            if(body !is CollisionBodyInterface) continue
+            val shape = body.shape
+            val intersectionReturnElement = shape.rayIntersect(startPoint, endPoint, minT1, distance)
+            if(intersectionReturnElement.intersectionFound) {
+                minT1 = intersectionReturnElement.maxDistance
+                minPx = intersectionReturnElement.minPx
+                minPy = intersectionReturnElement.minPy
+                intersectionFound = true
+                closestBody = intersectionReturnElement.closestBody
             }
         }
         if (intersectionFound) {

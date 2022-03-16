@@ -19,7 +19,7 @@ class ShadowCasting
  *
  * @param startPoint Origin of projecting rays.
  * @param distance   The desired distance to project the rays.
- */(var startPoint: Vec2, private val distance: Int) {
+ */(var startPoint: Vec2, private val distance: Double) {
 
     val rayData = ArrayList<RayAngleInformation>()
 

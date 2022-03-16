@@ -28,7 +28,7 @@ class RayScatter(epicentre: Vec2, private val noOfRays: Int) {
      *
      * @param distance Distance of projected rays.
      */
-    fun castRays(distance: Int) {
+    fun castRays(distance: Double) {
         val angle = 6.28319 / noOfRays
         val direction = Vec2(1.0, 1.0)
         val u = Mat2(angle)

@@ -13,7 +13,7 @@ import de.chaffic.rays.RayInformation
  * @param distance    Distance of projected rays.
  * @param worldBodies The world the rays effect and are projected in.
  */
-class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Int, worldBodies: ArrayList<TranslatableBody>) : Explosion {
+class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Double, worldBodies: ArrayList<TranslatableBody>) : Explosion {
     val rayScatter: RayScatter
 
     /**
