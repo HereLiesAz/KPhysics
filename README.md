@@ -123,7 +123,9 @@ This takes the time passed between the last step and now.
 KPhysics is very feature rich. For example, there is RayTracing, particle physics and explosion physics. To learn more about these things, it is worth taking a look at our dokka, or the javascripts.
 
 ## Documentation
-Coming soon!
+[Dokka](https://kphysics.github.io/KPhysics/docs/dokka/index.html)
+
+[Javadocs](https://kphysics.github.io/KPhysics/docs/dokkaJavadoc/index.html)
 
 ## Credits
 Everything in this project is based on the [JPhysics](https://github.com/HaydenMarshalla/JPhysics).
