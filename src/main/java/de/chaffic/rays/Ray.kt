@@ -70,7 +70,7 @@ class Ray(var startPoint: Vec2, direction: Vec2, distance: Int) {
      */
     fun updateProjection(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         rayInformation = null
-        val endPoint = direction.scalar(distance.toDouble())
+        val endPoint = direction.scalar(distance.toDouble()) + startPoint
         val endX = endPoint.x
         val endY = endPoint.y
         var minT1 = Double.POSITIVE_INFINITY
