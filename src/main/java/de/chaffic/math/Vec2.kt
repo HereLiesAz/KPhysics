@@ -265,5 +265,11 @@ class Vec2(var x: Double = .0, var y: Double = .0) {
             }
             return array
         }
+
+        val ZERO = Vec2(0.0, 0.0)
+        val DOWN = Vec2(0.0, -1.0)
+        val UP = Vec2(0.0, 1.0)
+        val LEFT = Vec2(-1.0, 0.0)
+        val RIGHT = Vec2(1.0, 0.0)
     }
 }
