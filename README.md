@@ -1,4 +1,4 @@
-# [KPhysics](https://kphysics.github.io/KPhysics/) (based on [JPhysics](https://github.com/HaydenMarshalla/JPhysics))
+# [KPhysics](https://kphysics.github.io/KPhysics/)
 KPhysics is an improved and extended version of Hayden Marshall's JPhysics. It is a 2D physics engine with zero third-party dependencies.
 
 It is written in Kotlin and is intended to be easily used in games programmed with Kotlin or Java.
@@ -123,9 +123,7 @@ This takes the time passed between the last step and now.
 KPhysics is very feature rich. For example, there is RayTracing, particle physics and explosion physics. To learn more about these things, it is worth taking a look at our dokka, or the javascripts.
 
 ## Documentation
-[Dokka](https://kphysics.github.io/KPhysics/docs/dokka/index.html)
-
-[Javadocs](https://kphysics.github.io/KPhysics/docs/dokkaJavadoc/index.html)
+Coming soon!
 
 ## Credits
 Everything in this project is based on the [JPhysics](https://github.com/HaydenMarshalla/JPhysics).
