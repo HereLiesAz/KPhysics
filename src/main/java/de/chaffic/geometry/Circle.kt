@@ -7,18 +7,34 @@ import de.chaffic.math.Vec2
 import kotlin.math.sqrt
 
 /**
- * Circle class to create a circle object.
- */
-class Circle
-/**
- * Constructor for a circle.
+ * Represents a circle shape to be used in a physics body.
  *
- * @param radius Desired radius of the circle.
- */(var radius: Double) : Shape() {
+ * A circle is defined by its radius. It is a simple and efficient shape for collision detection.
+ *
+ * Example of creating a circular body:
+ * ```kotlin
+ * // Create a circle shape with a radius of 25.0
+ * val circleShape = Circle(25.0)
+ *
+ * // Create a body with this shape at position (100, 100)
+ * val circleBody = Body(circleShape, 100.0, 100.0)
+ *
+ * // Add the body to the world
+ * world.addBody(circleBody)
+ * ```
+ *
+ * @property radius The radius of the circle.
+ * @param radius The desired radius of the circle.
+ *
+ * @see Shape
+ * @see Body
+ */
+class Circle(var radius: Double) : Shape() {
     /**
-     * Calculates the mass of a circle.
+     * Calculates the mass and inertia of the circle based on its area and the given density.
+     * The results are stored in the parent [Body].
      *
-     * @param density The desired density to factor into the calculation.
+     * @param density The density of the material, used to calculate mass.
      */
     override fun calcMass(density: Double) {
         val physicalBody = this.body
@@ -30,23 +46,33 @@ class Circle
     }
 
     /**
-     * Generates an AABB and binds it to the body.
+     * Generates an axis-aligned bounding box (AABB) for the circle.
+     * The AABB is centered around the circle's position and is large enough to fully contain it.
      */
     override fun createAABB() {
         this.body.aabb = AxisAlignedBoundingBox(Vec2(-radius, -radius), Vec2(radius, radius))
     }
 
     /**
-     * Method to check if point is inside a body in world space.
+     * Checks if a given point is inside the circle.
      *
-     * @param startPoint Vector point to check if its inside the first body.
-     * @return boolean value whether the point is inside the first body.
+     * @param startPoint The point to check, in world coordinates.
+     * @return `true` if the point is inside or on the boundary of the circle, `false` otherwise.
      */
     override fun isPointInside(startPoint: Vec2): Boolean {
         val d = this.body.position.minus(startPoint)
         return d.length() <= radius
     }
 
+    /**
+     * Performs a ray-intersection test with the circle.
+     *
+     * @param startPoint The starting point of the ray in world coordinates.
+     * @param endPoint The end point of the ray in world coordinates.
+     * @param maxDistance The maximum distance for a valid intersection.
+     * @param rayLength The total length of the ray.
+     * @return An [IntersectionReturnElement] containing information about the intersection, if one occurred.
+     */
     override fun rayIntersect(startPoint: Vec2, endPoint: Vec2, maxDistance: Double, rayLength: Double): IntersectionReturnElement {
         var minPx = 0.0
         var minPy = 0.0

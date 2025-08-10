@@ -10,8 +10,32 @@ import de.chaffic.math.Vec2
 import kotlin.math.pow
 
 /**
- * Class for creating a world with iterative solver structure.
+ * The `World` class is the main container for all physics objects and simulations.
+ * It manages the bodies, joints, and the overall physics simulation steps.
  *
+ * A world can be configured with a global gravity vector. If no gravity is specified,
+ * it defaults to a zero vector, meaning no global gravity force will be applied to bodies.
+ *
+ * Example of creating a world, adding a body, and running the simulation:
+ * ```kotlin
+ * // Create a world with downward gravity
+ * val world = World(Vec2(0.0, -9.81))
+ *
+ * // Create a circular body and add it to the world
+ * val ball = Body(Circle(20.0), 0.0, 200.0)
+ * world.addBody(ball)
+ *
+ * // In your game loop, update the world with the time delta
+ * fun gameLoop(deltaTime: Double) {
+ *     world.step(deltaTime)
+ *     // ... render bodies ...
+ * }
+ * ```
+ *
+ * @property gravity The global gravity vector applied to all bodies in the world.
+ * @property bodies A list of all bodies currently in the world.
+ * @property joints A list of all joints currently in the world.
+ * @property contacts A list of all contact arbiters generated during the collision phase.
  * @param gravity The strength of gravity in the world.
  */
 class World(var gravity: Vec2 = Vec2()) {
@@ -19,10 +43,12 @@ class World(var gravity: Vec2 = Vec2()) {
     var bodies = ArrayList<TranslatableBody>()
 
     /**
-     * Adds a body to the world
+     * Adds a body to the world, making it part of the physics simulation.
      *
-     * @param b Body to add.
-     * @return Returns the newly added body.
+     * @param b The body to add to the world. It must be a [TranslatableBody].
+     * @return The body that was added.
+     * @throws IllegalArgumentException if the provided object is not a [TranslatableBody].
+     * @see removeBody
      */
     fun <T> addBody(b: T): T {
         if(b !is TranslatableBody) throw IllegalArgumentException("Not a translatable body")
@@ -34,6 +60,7 @@ class World(var gravity: Vec2 = Vec2()) {
      * Removes a body from the world.
      *
      * @param b The body to remove from the world.
+     * @see addBody
      */
     fun removeBody(b: TranslatableBody) {
         bodies.remove(b)
@@ -43,10 +70,11 @@ class World(var gravity: Vec2 = Vec2()) {
     var joints = ArrayList<Joint>()
 
     /**
-     * Adds a joint to the world.
+     * Adds a joint to the world, which creates a constraint between bodies.
      *
      * @param j The joint to add.
-     * @return Returns the joint added to the world.
+     * @return The joint that was added.
+     * @see removeJoint
      */
     fun addJoint(j: Joint): Joint {
         joints.add(j)
@@ -57,6 +85,7 @@ class World(var gravity: Vec2 = Vec2()) {
      * Removes a joint from the world.
      *
      * @param j The joint to remove from the world.
+     * @see addJoint
      */
     fun removeJoint(j: Joint) {
         joints.remove(j)
@@ -65,9 +94,11 @@ class World(var gravity: Vec2 = Vec2()) {
     var contacts = ArrayList<Arbiter>()
 
     /**
-     * The main time step method for the world to conduct an iteration of the current world call this method with a desired time step value.
+     * Advances the physics simulation by a given time step.
+     * This method performs collision detection, solves constraints, and updates the positions of all bodies.
+     * It should be called once per frame in your game loop.
      *
-     * @param dt Timestep
+     * @param dt The time step, in seconds, to advance the simulation by.
      */
     fun step(dt: Double) {
         contacts.clear()
@@ -197,7 +228,8 @@ class World(var gravity: Vec2 = Vec2()) {
     }
 
     /**
-     * Clears all objects in the current world
+     * Removes all bodies, joints, and contacts from the world.
+     * This is useful for resetting the simulation state.
      */
     fun clearWorld() {
         bodies.clear()
@@ -206,7 +238,10 @@ class World(var gravity: Vec2 = Vec2()) {
     }
 
     /**
-     * Applies gravitational forces between to objects (force applied to centre of body)
+     * Applies gravitational forces between all pairs of objects in the world.
+     * This method calculates the gravitational force based on the mass of the objects and the distance between them.
+     * Note that this is different from the global `gravity` vector, which applies a constant force to all objects.
+     * This method simulates n-body gravitational attraction.
      */
     fun gravityBetweenObj() {
         for (a in bodies.indices) {

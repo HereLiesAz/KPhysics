@@ -5,21 +5,41 @@ import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 
 /**
- * Class for a joint between a body and a point in world space.
- */
-class JointToPoint
-/**
- * Convenience constructor that works like
- * [.JointToPoint]
+ * A joint that connects a body to a fixed point in world space.
  *
- * @param pointAttachedTo The point the joint is attached to
- * @param b1            First body the joint is attached to
- * @param jointLength   The desired distance of the joint between two points/bodies
- * @param jointConstant The strength of the joint
- * @param dampening     The dampening constant to use for the joints forces
- * @param canGoSlack    Boolean whether the joint can go slack or not
- * @param offset       Offset to be applied to the location of the joint relative to b1's object space
- */(
+ * This is useful for creating things like pendulums or tethers. The joint applies forces
+ * to the body to keep it at a certain distance from the anchor point.
+ *
+ * Example of creating a pendulum:
+ * ```kotlin
+ * val anchorPoint = Vec2(200.0, 300.0)
+ * val pendulumBob = Body(Circle(20.0), 200.0, 100.0)
+ *
+ * val joint = JointToPoint(
+ *     pendulumBob,
+ *     anchorPoint,
+ *     naturalLength = 200.0,
+ *     springConstant = 1000.0,
+ *     dampening = 20.0,
+ *     canGoSlack = false,
+ *     offset = Vec2(0.0, 0.0) // Attach to the center of the bob
+ * )
+ *
+ * world.addBody(pendulumBob)
+ * world.addJoint(joint)
+ * ```
+ *
+ * @property pointAttachedTo The fixed point in world space that the joint is attached to.
+ *
+ * @param b1 The body to attach the joint to.
+ * @param pointAttachedTo The fixed anchor point for the joint in world coordinates.
+ * @param jointLength The desired distance between the body and the anchor point.
+ * @param jointConstant The spring constant (stiffness) of the joint.
+ * @param dampening The dampening factor to reduce oscillations.
+ * @param canGoSlack Whether the joint can go slack (exert no force when compressed).
+ * @param offset The offset from the body's center to its attachment point.
+ */
+class JointToPoint(
     b1: Body,
     val pointAttachedTo: Vec2,
     jointLength: Double,
@@ -30,7 +50,7 @@ class JointToPoint
 ) : Joint(b1, jointLength, jointConstant, dampening, canGoSlack, offset) {
 
     /**
-     * Applies tension to the body attached to the joint.
+     * Applies the calculated tension force as an impulse to the connected body.
      */
     override fun applyTension() {
         val mat1 = Mat2(body.orientation)
@@ -43,9 +63,10 @@ class JointToPoint
     }
 
     /**
-     * Calculates tension between the two attachment points of the joints body and point.
+     * Calculates the tension force based on the current distance between the body's attachment point
+     * and the fixed world point.
      *
-     * @return double value of the tension force between the point and attached bodies point
+     * @return The calculated tension force.
      */
     override fun calculateTension(): Double {
         val distance = object1AttachmentPoint.minus(pointAttachedTo).length()
@@ -59,9 +80,9 @@ class JointToPoint
     }
 
     /**
-     * Determines the rate of change between the attached point and body.
+     * Calculates the rate of change of the distance between the body's attachment point and the fixed world point.
      *
-     * @return double value of the rate of change
+     * @return The rate of change of the joint's extension.
      */
     override fun rateOfChangeOfExtension(): Double {
         val distance = pointAttachedTo.minus(object1AttachmentPoint)

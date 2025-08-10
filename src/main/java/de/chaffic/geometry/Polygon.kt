@@ -8,16 +8,40 @@ import de.chaffic.math.Math.pointIsOnLine
 import de.chaffic.math.Vec2
 
 /**
- * Class for representing polygon shape.
+ * Represents a convex polygon shape for a physics body.
+ *
+ * Polygons can be created in several ways:
+ * - From a list of vertices, which will be automatically converted to a convex hull.
+ * - As a rectangle with a given width and height.
+ * - As a regular polygon with a given radius and number of sides.
+ *
+ * Example of creating a polygonal body:
+ * ```kotlin
+ * // Create a rectangular polygon shape
+ * val boxShape = Polygon(50.0, 50.0)
+ *
+ * // Create a body with this shape
+ * val boxBody = Body(boxShape, 200.0, 200.0)
+ *
+ * // Add it to the world
+ * world.addBody(boxBody)
+ * ```
+ *
+ * @property vertices The vertices of the polygon in local coordinates.
+ * @property normals The outward-facing normals for each edge of the polygon.
+ *
+ * @see Shape
+ * @see Body
  */
 class Polygon : Shape {
     var vertices: Array<Vec2>
     lateinit var normals: Array<Vec2>
 
     /**
-     * Constructor takes a supplied list of vertices and generates a convex hull around them.
+     * Creates a polygon from a list of vertices.
+     * The constructor automatically computes the convex hull of the given vertices to ensure the polygon is convex.
      *
-     * @param vertList Vertices of polygon to create.
+     * @param vertList An array of [Vec2] points representing the vertices of the polygon.
      */
     constructor(vertList: Array<Vec2>) {
         vertices = generateHull(vertList, vertList.size)
@@ -25,17 +49,17 @@ class Polygon : Shape {
     }
 
     /**
-     * Constructor to generate a rectangle.
+     * Creates a rectangular polygon centered at the origin.
      *
-     * @param width  Desired width of rectangle
-     * @param height Desired height of rectangle
+     * @param width The total width of the rectangle.
+     * @param height The total height of the rectangle.
      */
     constructor(width: Double, height: Double) {
         vertices = arrayOf(
-            Vec2(-width, -height),
-            Vec2(width, -height),
-            Vec2(width, height),
-            Vec2(-width, height)
+            Vec2(-width / 2, -height / 2),
+            Vec2(width / 2, -height / 2),
+            Vec2(width / 2, height / 2),
+            Vec2(-width / 2, height / 2)
         )
         normals = arrayOf(
             Vec2(0.0, -1.0),
@@ -46,10 +70,10 @@ class Polygon : Shape {
     }
 
     /**
-     * Generate a regular polygon with a specified number of sides and size.
+     * Creates a regular polygon (e.g., triangle, pentagon, hexagon) centered at the origin.
      *
-     * @param radius    The maximum distance any vertex is away from the center of mass.
-     * @param noOfSides The desired number of face the polygon has.
+     * @param radius The radius of the circle that circumscribes the polygon.
+     * @param noOfSides The number of sides (and vertices) the polygon should have.
      */
     constructor(radius: Int, noOfSides: Int) {
         val vertices = MutableList(noOfSides) { Vec2() }
@@ -64,7 +88,8 @@ class Polygon : Shape {
     }
 
     /**
-     * Generates normals for each face of the polygon. Positive normals of polygon faces face outward.
+     * Calculates the normal for each edge of the polygon.
+     * The normals are outward-facing and are used in collision detection.
      */
     private fun calcNormals() {
         val normals = MutableList(vertices.size) { Vec2() }
@@ -76,9 +101,10 @@ class Polygon : Shape {
     }
 
     /**
-     * Implementation of calculating the mass of a polygon.
+     * Calculates the mass and inertia of the polygon based on its area and the given density.
+     * The results are stored in the parent [Body].
      *
-     * @param density The desired density to factor into the calculation.
+     * @param density The density of the material, used to calculate mass.
      */
     override fun calcMass(density: Double) {
         val physicalBody = this.body
@@ -111,7 +137,8 @@ class Polygon : Shape {
     }
 
     /**
-     * Generates an AABB encompassing the polygon and binds it to the body.
+     * Generates an axis-aligned bounding box (AABB) for the polygon.
+     * The AABB is calculated based on the transformed vertices of the polygon.
      */
     override fun createAABB() {
         val firstPoint = orientation.mul(vertices[0], Vec2())
@@ -138,11 +165,11 @@ class Polygon : Shape {
     }
 
     /**
-     * Generates a convex hull around the vertices supplied.
+     * Generates a convex hull from a given set of vertices using the Monotone Chain algorithm.
      *
-     * @param vertices List of vertices.
-     * @param n        Number of vertices supplied.
-     * @return Returns a convex hull array.
+     * @param vertices An array of points.
+     * @param n The number of vertices in the array.
+     * @return An array of vertices representing the convex hull.
      */
     private fun generateHull(vertices: Array<Vec2>, n: Int): Array<Vec2> {
         val hull = ArrayList<Vec2>()
@@ -175,12 +202,12 @@ class Polygon : Shape {
     }
 
     /**
-     * Checks which side of a line a point is on.
+     * Determines which side of a line a given point lies on.
      *
-     * @param p1    Vertex of line to evaluate.
-     * @param p2    Vertex of line to evaluate.
-     * @param point Point to check which side it lies on.
-     * @return Int value - positive = right side of line. Negative = left side of line.
+     * @param p1 The first point defining the line.
+     * @param p2 The second point defining the line.
+     * @param point The point to check.
+     * @return 1 if the point is on the right side, -1 if on the left, and 0 if it's on the line.
      */
     private fun sideOfLine(p1: Vec2, p2: Vec2, point: Vec2): Int {
         val value = (p2.y - p1.y) * (point.x - p2.x) - (p2.x - p1.x) * (point.y - p2.y)
@@ -188,10 +215,11 @@ class Polygon : Shape {
     }
 
     /**
-     * Method to check if point is inside a body in world space.
+     * Checks if a given point is inside the polygon.
+     * This is done using the Separating Axis Theorem (SAT) by checking the point against each face normal.
      *
-     * @param startPoint Vector point to check if its inside the first body.
-     * @return boolean value whether the point is inside the first body.
+     * @param startPoint The point to check, in world coordinates.
+     * @return `true` if the point is inside the polygon, `false` otherwise.
      */
     override fun isPointInside(startPoint: Vec2): Boolean {
         for (i in vertices.indices) {
@@ -210,6 +238,15 @@ class Polygon : Shape {
         return true
     }
 
+    /**
+     * Performs a ray-intersection test with the polygon.
+     *
+     * @param startPoint The starting point of the ray in world coordinates.
+     * @param endPoint The end point of the ray in world coordinates.
+     * @param maxDistance The maximum distance for a valid intersection.
+     * @param rayLength The total length of the ray.
+     * @return An [IntersectionReturnElement] containing information about the intersection, if one occurred.
+     */
     override fun rayIntersect(startPoint: Vec2, endPoint: Vec2, maxDistance: Double, rayLength: Double): IntersectionReturnElement {
         var minPx = 0.0
         var minPy = 0.0
