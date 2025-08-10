@@ -5,6 +5,7 @@ import de.chaffic.dynamics.World
 import de.chaffic.geometry.Circle
 import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
+import java.time.Instant
 
 /**
  * Simulates an explosion by creating a number of small, fast-moving particles.
@@ -18,7 +19,7 @@ import de.chaffic.math.Vec2
  *
  * Example of creating a particle explosion:
  * ```kotlin
- * // Create a particle explosion with 50 particles
+ * // Create a particle explosion with 50 particles that live for 2 seconds
  * val particleExplosion = ParticleExplosion(Vec2(300.0, 300.0), 50, 2.0)
  *
  * // Create the particles in the world
@@ -26,15 +27,19 @@ import de.chaffic.math.Vec2
  *
  * // Apply an initial impulse to the particles
  * particleExplosion.applyBlastImpulse(100.0)
+ *
+ * // In your game loop, periodically remove expired particles
+ * particleExplosion.removeExpiredParticles(world)
  * ```
  *
  * @property particles A list of the particle bodies created by the explosion.
  *
  * @param epicentre The center point from which particles will be spawned.
  * @param noOfParticles The total number of particles to create.
- * @param lifespan The life time of the particle (currently not implemented).
+ * @param lifespan The life time of the particles in seconds.
  */
 class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: Int, private val lifespan: Double) {
+    private val creationTimes = MutableList(noOfParticles) { Instant.now().toEpochMilli() }
     val particles = MutableList(noOfParticles) { Body(Circle(.0),.0, .0) }
 
     /**
@@ -76,6 +81,28 @@ class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: 
         for (b in particles) {
             line = b.position.minus(epicentre)
             b.velocity.set(line.scalar(blastPower))
+        }
+    }
+
+    /**
+     * Removes expired particles from the world.
+     * This should be called periodically (e.g., in your game loop) to clean up old particles.
+     *
+     * @param world The world from which to remove the particles.
+     */
+    fun removeExpiredParticles(world: World) {
+        val now = Instant.now().toEpochMilli()
+        val iterator = particles.listIterator()
+        var idx = 0
+        while (iterator.hasNext()) {
+            val particle = iterator.next()
+            if (now - creationTimes[idx] > lifespan * 1000) {
+                world.removeBody(particle)
+                iterator.remove()
+                creationTimes.removeAt(idx)
+                idx--
+            }
+            idx++
         }
     }
 }
