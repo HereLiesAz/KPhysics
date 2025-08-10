@@ -7,27 +7,44 @@ import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 
 /**
- * Models particle explosions.
+ * Simulates an explosion by creating a number of small, fast-moving particles.
  *
- * @param epicentre     Vector location of explosion epicenter.
- * @param noOfParticles Total number of particles the explosion has.
- * @param lifespan          The life time of the particle.
+ * This class creates a set of particle bodies and launches them outwards from an epicenter.
+ * These particles can then collide with other objects in the world, transferring momentum
+ * and simulating the effect of shrapnel.
+ *
+ * Note: This class does not implement the [Explosion] interface directly, as its mechanism
+ * is different from the impulse-based explosions.
+ *
+ * Example of creating a particle explosion:
+ * ```kotlin
+ * // Create a particle explosion with 50 particles
+ * val particleExplosion = ParticleExplosion(Vec2(300.0, 300.0), 50, 2.0)
+ *
+ * // Create the particles in the world
+ * particleExplosion.createParticles(size = 2.0, density = 10, radius = 10, world = world)
+ *
+ * // Apply an initial impulse to the particles
+ * particleExplosion.applyBlastImpulse(100.0)
+ * ```
+ *
+ * @property particles A list of the particle bodies created by the explosion.
+ *
+ * @param epicentre The center point from which particles will be spawned.
+ * @param noOfParticles The total number of particles to create.
+ * @param lifespan The life time of the particle (currently not implemented).
  */
 class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: Int, private val lifespan: Double) {
-    /**
-     * Getter to return the list of particles in the world.
-     *
-     * @return Array of bodies.
-     */
     val particles = MutableList(noOfParticles) { Body(Circle(.0),.0, .0) }
 
     /**
-     * Creates particles in the supplied world.
+     * Creates the particle bodies and adds them to the specified world.
+     * The particles are arranged in a circle around the epicenter.
      *
-     * @param size    The size of the particles.
-     * @param density The density of the particles.
-     * @param radius  The distance away from the epicenter the particles are placed.
-     * @param world   The world the particles are created in.
+     * @param size The radius of each particle.
+     * @param density The density of each particle.
+     * @param radius The radius of the circle on which particles are initially placed.
+     * @param world The world to add the particles to.
      */
     fun createParticles(size: Double, density: Int, radius: Int, world: World) {
         val separationAngle = 6.28319 / noOfParticles
@@ -50,9 +67,9 @@ class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: 
     }
 
     /**
-     * Applies a blast impulse to all particles created.
+     * Applies an initial outward impulse to all particles, sending them flying from the epicenter.
      *
-     * @param blastPower The impulse magnitude.
+     * @param blastPower The magnitude of the impulse to apply to each particle.
      */
     fun applyBlastImpulse(blastPower: Double) {
         var line: Vec2

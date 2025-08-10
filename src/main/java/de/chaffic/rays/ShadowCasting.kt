@@ -11,22 +11,42 @@ import kotlin.math.asin
 import kotlin.math.atan2
 
 /**
- * A class for generating polygons that can mimic line of sight around objects and cast shadows.
- */
-class ShadowCasting
-/**
- * Constructor
+ * A utility for 2D shadow casting or field-of-view calculations.
  *
- * @param startPoint Origin of projecting rays.
- * @param distance   The desired distance to project the rays.
- */(var startPoint: Vec2, private val distance: Double) {
+ * This class works by casting rays from a central point towards the vertices of all relevant
+ * polygons and the tangent points of circles. By connecting the intersection points of these
+ * rays, you can construct a polygon representing the visible area or the area not in shadow.
+ *
+ * Example of using ShadowCasting:
+ * ```kotlin
+ * // Create a shadow caster at the light source's position
+ * val shadowCaster = ShadowCasting(lightSourcePosition, 1000.0)
+ *
+ * // Update it with the bodies that should cast shadows
+ * shadowCaster.updateProjections(world.bodies)
+ *
+ * // The rayData now contains a sorted list of ray intersections
+ * // which can be used to draw the light polygon.
+ * val lightPolygonPoints = shadowCaster.rayData.map { it.ray.rayInformation?.coordinates ?: it.ray.endPoint }
+ *
+ * ```
+ *
+ * @property startPoint The origin point from which rays are cast (e.g., the light source position).
+ * @property rayData A list of [RayAngleInformation] objects, containing all the cast rays and their intersection data, sorted by angle.
+ *
+ * @param startPoint The initial origin for projecting rays.
+ * @param distance The maximum distance the rays will be projected.
+ */
+class ShadowCasting(var startPoint: Vec2, private val distance: Double) {
 
     val rayData = ArrayList<RayAngleInformation>()
 
     /**
-     * Updates the all projections in world space and acquires information about all intersecting rays.
+     * Casts rays towards the key features (vertices, tangents) of the provided bodies
+     * and updates the list of ray intersections. The results are sorted by angle and
+     * stored in the [rayData] property.
      *
-     * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
+     * @param bodiesToEvaluate A list of bodies to cast shadows from.
      */
     fun updateProjections(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         rayData.clear()
@@ -59,10 +79,11 @@ class ShadowCasting
     }
 
     /**
-     * Projects a ray and evaluates it against all objects supplied in world space.
+     * Projects three slightly perturbed rays in a given direction and stores their intersection results.
+     * Casting multiple rays helps to avoid missing corners due to floating point inaccuracies.
      *
-     * @param direction        Direction of ray to project.
-     * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
+     * @param direction The base direction in which to project the rays.
+     * @param bodiesToEvaluate A list of bodies to check for intersection.
      */
     private fun projectRays(direction: Vec2, bodiesToEvaluate: ArrayList<TranslatableBody>) {
         val m = Mat2(0.001)
@@ -76,34 +97,20 @@ class ShadowCasting
     }
 
     /**
-     * Getter for number of rays projected.
-     *
-     * @return Returns size of raydata.
+     * @return The total number of rays projected in the last update.
      */
     val noOfRays: Int
         get() = rayData.size
 }
 
 /**
- * Ray information class to store relevant data about rays and any intersection found specific to shadow casting.
- */
-class RayAngleInformation
-/**
- * Constructor to store ray information.
+ * A data class that holds a [Ray] and its angle.
+ * This is used by [ShadowCasting] to sort ray intersections by angle.
  *
- * @param ray   Ray of intersection.
- * @param angle Angle the ray is set to.
- */(
-    /**
-     * Getter for RAY.
-     *
-     * @return returns RAY.
-     */
-    val ray: Ray,
-    /**
-     * Getter for ANGLE.
-     *
-     * @return returns ANGLE.
-     */
-    val angle: Double
-)
+ * @property ray The ray object.
+ * @property angle The angle of the ray in radians.
+ *
+ * @param ray The [Ray] object.
+ * @param angle The angle of the ray, used for sorting.
+ */
+class RayAngleInformation(val ray: Ray, val angle: Double)

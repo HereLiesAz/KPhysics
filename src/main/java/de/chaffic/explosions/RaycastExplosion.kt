@@ -6,20 +6,40 @@ import de.chaffic.math.Vec2
 import de.chaffic.rays.RayInformation
 
 /**
- * Models raycast explosions.
+ * Represents an explosion that affects bodies based on line-of-sight from the epicenter.
  *
- * @param epicentre   The epicentre of the explosion.
- * @param noOfRays    Number of projected rays.
- * @param distance    Distance of projected rays.
- * @param worldBodies The world the rays effect and are projected in.
+ * This type of explosion casts a number of rays out from its epicenter. If a ray intersects
+ * a body, an impulse is applied at the point of intersection. This simulates explosions
+ * that are blocked by obstacles.
+ *
+ * Example of using a raycast explosion:
+ * ```kotlin
+ * // Create a raycast explosion with 36 rays, each 500 units long
+ * val explosion = RaycastExplosion(
+ *     epicentre = Vec2(300.0, 300.0),
+ *     noOfRays = 36,
+ *     distance = 500.0,
+ *     worldBodies = world.bodies
+ * )
+ *
+ * // Apply the blast impulse to the affected bodies
+ * explosion.applyBlastImpulse(10000.0)
+ * ```
+ *
+ * @property rayScatter The [RayScatter] instance used to cast the rays for the explosion.
+ *
+ * @param epicentre The center point of the explosion in world coordinates.
+ * @param noOfRays The number of rays to cast out from the epicenter.
+ * @param distance The maximum length of each ray.
+ * @param worldBodies The list of bodies in the world to test for intersection.
  */
 class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Double, worldBodies: ArrayList<TranslatableBody>) : Explosion {
     val rayScatter: RayScatter
 
     /**
-     * Sets the epicentre to a different coordinate.
+     * Moves the epicenter of the explosion to a new position.
      *
-     * @param v The vector position of the new epicentre.
+     * @param v The new position for the explosion's epicenter.
      */
     override fun setEpicentre(v: Vec2) {
         rayScatter.epicentre = v
@@ -34,9 +54,9 @@ class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Double, worldBo
     }
 
     /**
-     * Updates the arraylist to reevaluate what objects are effected/within the proximity.
+     * Updates the explosion by recasting all rays and determining which bodies are hit.
      *
-     * @param bodiesToEvaluate Arraylist of bodies in the world to check.
+     * @param bodiesToEvaluate The list of bodies in the world to check for intersection.
      */
     override fun update(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         raysInContact.clear()
@@ -51,9 +71,10 @@ class RaycastExplosion(epicentre: Vec2, noOfRays: Int, distance: Double, worldBo
     }
 
     /**
-     * Applies a blast impulse to the effected bodies.
+     * Applies a blast impulse to each body hit by a ray. The impulse is applied at the point
+     * of intersection and is directed away from the epicenter.
      *
-     * @param blastPower The impulse magnitude.
+     * @param blastPower The base magnitude of the blast impulse.
      */
     override fun applyBlastImpulse(blastPower: Double) {
         for (ray in raysInContact) {

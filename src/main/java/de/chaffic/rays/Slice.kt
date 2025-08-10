@@ -11,11 +11,34 @@ import de.chaffic.math.Vec2
 import kotlin.math.sqrt
 
 /**
- * Class to allow two polygons to be sliced.
+ * A utility class for slicing polygons with a line segment.
  *
- * @param startPoint The origin of the rays projection.
- * @param direction  The direction of the ray points in radians.
- * @param distance   The distance the ray is projected
+ * This class defines a line segment (a "slice") and can find all intersection points
+ * with a given set of bodies. For any polygon that is intersected twice, the [sliceObjects]
+ * method can be used to replace the original polygon with two new, smaller polygons.
+ *
+ * Note: This utility currently only supports slicing [Polygon] shapes.
+ *
+ * Example of slicing a body:
+ * ```kotlin
+ * // Define a slice line across the world
+ * val slice = Slice(Vec2(0.0, 250.0), Vec2(1.0, 0.0), 500.0)
+ *
+ * // Find all intersections with bodies
+ * slice.updateProjection(world.bodies)
+ *
+ * // Perform the slice operation
+ * slice.sliceObjects(world)
+ * ```
+ *
+ * @property startPoint The starting point of the slice line.
+ * @property distance The length of the slice line.
+ * @property direction The normalized direction vector of the slice line.
+ * @property intersectingBodiesInfo A list of [RayInformation] objects, one for each point where the slice line intersects a body.
+ *
+ * @param startPoint The origin of the slice line.
+ * @param direction The direction vector of the slice.
+ * @param distance The length of the slice line.
  */
 class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
     var distance: Double
@@ -33,9 +56,10 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
     }
 
     /**
-     * Updates the projection in world space and acquires information about the closest intersecting object with the ray projection.
+     * Finds all intersection points between the slice line and the provided bodies.
+     * The results are stored in the [intersectingBodiesInfo] list.
      *
-     * @param bodiesToEvaluate Arraylist of bodies to check if they intersect with the ray projection.
+     * @param bodiesToEvaluate A list of bodies to check for intersection.
      */
     fun updateProjection(bodiesToEvaluate: ArrayList<TranslatableBody>) {
         intersectingBodiesInfo.clear()
@@ -108,9 +132,14 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
     }
 
     /**
-     * Slices any polygons in the world supplied that intersect with the ray projection.
+     * Slices any polygons that were intersected by the slice line.
      *
-     * @param world World object for the slice to effect.
+     * For each polygon that was intersected at two points, this method will:
+     * 1. Remove the original polygon from the world.
+     * 2. Create two new polygons based on the slice.
+     * 3. Add the two new polygons to the world.
+     *
+     * @param world The world containing the bodies to be sliced.
      */
     fun sliceObjects(world: World) {
         val k = intersectingBodiesInfo.size % 2
@@ -159,10 +188,10 @@ class Slice(val startPoint: Vec2, direction: Vec2, distance: Double) {
     }
 
     /**
-     * Finds the center of mass of a polygon and return its.
+     * Calculates the geometric centroid of a polygon defined by a list of vertices.
      *
-     * @param obj2Vertz Vertices of polygon to find center of mass of.
-     * @return Center of mass of type Vec2.
+     * @param obj2Vertz A list of vertices defining the polygon.
+     * @return The calculated centroid of the polygon as a [Vec2].
      */
     private fun findPolyCentre(obj2Vertz: MutableList<Vec2>): Vec2 {
         var accumulatedArea = 0.0
