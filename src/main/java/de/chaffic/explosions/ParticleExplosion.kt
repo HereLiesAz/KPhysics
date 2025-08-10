@@ -1,11 +1,14 @@
 package de.chaffic.explosions
 
 import de.chaffic.dynamics.Body
+import de.chaffic.dynamics.Body
 import de.chaffic.dynamics.World
 import de.chaffic.geometry.Circle
 import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 import java.time.Instant
+
+private data class Particle(val body: Body, val creationTime: Long = Instant.now().toEpochMilli())
 
 /**
  * Simulates an explosion by creating a number of small, fast-moving particles.
@@ -39,8 +42,7 @@ import java.time.Instant
  * @param lifespan The life time of the particles in seconds.
  */
 class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: Int, private val lifespan: Double) {
-    private val creationTimes = MutableList(noOfParticles) { Instant.now().toEpochMilli() }
-    val particles = MutableList(noOfParticles) { Body(Circle(.0),.0, .0) }
+    private val particles = mutableListOf<Particle>()
 
     /**
      * Creates the particle bodies and adds them to the specified world.
@@ -66,7 +68,7 @@ class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: 
             b.linearDampening = 0.0
             b.particle = true
             world.addBody(b)
-            particles[i] = b
+            particles.add(Particle(b))
             rotate.mul(distanceFromCentre)
         }
     }
@@ -78,9 +80,9 @@ class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: 
      */
     fun applyBlastImpulse(blastPower: Double) {
         var line: Vec2
-        for (b in particles) {
-            line = b.position.minus(epicentre)
-            b.velocity.set(line.scalar(blastPower))
+        for (p in particles) {
+            line = p.body.position.minus(epicentre)
+            p.body.velocity.set(line.scalar(blastPower))
         }
     }
 
@@ -92,17 +94,12 @@ class ParticleExplosion(private val epicentre: Vec2, private val noOfParticles: 
      */
     fun removeExpiredParticles(world: World) {
         val now = Instant.now().toEpochMilli()
-        val iterator = particles.listIterator()
-        var idx = 0
-        while (iterator.hasNext()) {
-            val particle = iterator.next()
-            if (now - creationTimes[idx] > lifespan * 1000) {
-                world.removeBody(particle)
-                iterator.remove()
-                creationTimes.removeAt(idx)
-                idx--
+        particles.removeIf { particle ->
+            val isExpired = now - particle.creationTime > lifespan * 1000
+            if (isExpired) {
+                world.removeBody(particle.body)
             }
-            idx++
+            isExpired
         }
     }
 }

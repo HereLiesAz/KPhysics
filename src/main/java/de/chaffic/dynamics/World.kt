@@ -46,10 +46,10 @@ class World(var gravity: Vec2 = Vec2()) {
      * Adds a body to the world, making it part of the physics simulation.
      *
      * @param body The [TranslatableBody] to add to the world.
-     * @return The body that was added.
+     * @return The body that was added, with its concrete type preserved.
      * @see removeBody
      */
-    fun addBody(body: TranslatableBody): TranslatableBody {
+    fun <T : TranslatableBody> addBody(body: T): T {
         bodies.add(body)
         return body
     }
