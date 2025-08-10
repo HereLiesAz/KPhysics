@@ -45,15 +45,13 @@ class World(var gravity: Vec2 = Vec2()) {
     /**
      * Adds a body to the world, making it part of the physics simulation.
      *
-     * @param b The body to add to the world. It must be a [TranslatableBody].
+     * @param body The [TranslatableBody] to add to the world.
      * @return The body that was added.
-     * @throws IllegalArgumentException if the provided object is not a [TranslatableBody].
      * @see removeBody
      */
-    fun <T> addBody(b: T): T {
-        if(b !is TranslatableBody) throw IllegalArgumentException("Not a translatable body")
-        bodies.add(b as TranslatableBody)
-        return b
+    fun addBody(body: TranslatableBody): TranslatableBody {
+        bodies.add(body)
+        return body
     }
 
     /**
