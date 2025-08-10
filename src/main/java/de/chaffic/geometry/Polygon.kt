@@ -42,8 +42,12 @@ class Polygon : Shape {
      * The constructor automatically computes the convex hull of the given vertices to ensure the polygon is convex.
      *
      * @param vertList An array of [Vec2] points representing the vertices of the polygon.
+     * @throws IllegalArgumentException if the number of vertices is less than 3.
      */
     constructor(vertList: Array<Vec2>) {
+        if (vertList.size < 3) {
+            throw IllegalArgumentException("A polygon must have at least 3 vertices.")
+        }
         vertices = generateHull(vertList, vertList.size)
         calcNormals()
     }
