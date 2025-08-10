@@ -113,4 +113,4 @@ class ShadowCasting(var startPoint: Vec2, private val distance: Double) {
  * @param ray The [Ray] object.
  * @param angle The angle of the ray, used for sorting.
  */
-class RayAngleInformation(val ray: Ray, val angle: Double)
+data class RayAngleInformation(val ray: Ray, val angle: Double)
