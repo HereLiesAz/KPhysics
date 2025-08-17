@@ -53,18 +53,36 @@ class Polygon : Shape {
     }
 
     /**
-     * Creates a rectangular polygon centered at the origin.
+     * Creates a rectangular polygon with its origin at the corner (0,0).
      *
      * @param width The total width of the rectangle.
      * @param height The total height of the rectangle.
      */
-    constructor(width: Double, height: Double) {
-        vertices = arrayOf(
-            Vec2(-width / 2, -height / 2),
-            Vec2(width / 2, -height / 2),
-            Vec2(width / 2, height / 2),
-            Vec2(-width / 2, height / 2)
-        )
+    constructor(width: Double, height: Double) : this(width, height, false)
+
+    /**
+     * Creates a rectangular polygon.
+     *
+     * @param width The total width of the rectangle.
+     * @param height The total height of the rectangle.
+     * @param centered If true, the polygon is centered at the origin. If false, the origin is at the corner.
+     */
+    constructor(width: Double, height: Double, centered: Boolean) {
+        vertices = if (centered) {
+            arrayOf(
+                Vec2(-width / 2, -height / 2),
+                Vec2(width / 2, -height / 2),
+                Vec2(width / 2, height / 2),
+                Vec2(-width / 2, height / 2)
+            )
+        } else {
+            arrayOf(
+                Vec2(0.0, 0.0),
+                Vec2(width, 0.0),
+                Vec2(width, height),
+                Vec2(0.0, height)
+            )
+        }
         normals = arrayOf(
             Vec2(0.0, -1.0),
             Vec2(1.0, 0.0),

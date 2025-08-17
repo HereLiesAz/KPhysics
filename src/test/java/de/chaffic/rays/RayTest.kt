@@ -14,7 +14,7 @@ class RayTest : TestCase() {
     fun testPolygonRight() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 300.0, 0.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 300.0, 0.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -30,7 +30,7 @@ class RayTest : TestCase() {
     fun testPolygonLeft() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), -300.0, 0.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), -300.0, 0.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -46,7 +46,7 @@ class RayTest : TestCase() {
     fun testPolygonUp() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 0.0, 300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 0.0, 300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -62,7 +62,7 @@ class RayTest : TestCase() {
     fun testPolygonDown() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 0.0, -300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 0.0, -300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -78,7 +78,7 @@ class RayTest : TestCase() {
     fun testPolygonRightOffset() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 300.0, 300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 300.0, 300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -94,7 +94,7 @@ class RayTest : TestCase() {
     fun testPolygonLeftOffset() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), -300.0, 300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), -300.0, 300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -110,7 +110,7 @@ class RayTest : TestCase() {
     fun testPolygonUpOffset() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 300.0, 300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 300.0, 300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -126,7 +126,7 @@ class RayTest : TestCase() {
     fun testPolygonDownOffset() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), 300.0, -300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), 300.0, -300.0)
         plattform.density = .0
 
         world.addBody(plattform)
@@ -142,7 +142,7 @@ class RayTest : TestCase() {
     fun testPolygonDiagonal() {
         val world = World(Vec2(.0, -9.81))
 
-        val plattform = Body(Polygon(50.0, 100.0), .0, -300.0)
+        val plattform = Body(Polygon(50.0, 100.0, true), .0, -300.0)
         plattform.density = .0
 
         world.addBody(plattform)
