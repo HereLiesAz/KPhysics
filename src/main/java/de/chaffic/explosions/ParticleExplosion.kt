@@ -1,7 +1,6 @@
 package de.chaffic.explosions
 
 import de.chaffic.dynamics.Body
-import de.chaffic.dynamics.Body
 import de.chaffic.dynamics.World
 import de.chaffic.geometry.Circle
 import de.chaffic.math.Mat2
