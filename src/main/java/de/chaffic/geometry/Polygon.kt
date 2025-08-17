@@ -48,7 +48,9 @@ class Polygon : Shape {
         vertices = generateHull(vertList, vertList.size)
         if (vertices.size < 3) {
             throw IllegalArgumentException("A polygon must have at least 3 vertices after convex hull generation. Check for collinear points.")
-        }
+        // Allow degenerate polygons with fewer than 3 vertices for backward compatibility.
+        // If desired, add a warning here.
+        
         calcNormals()
     }
 

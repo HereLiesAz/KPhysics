@@ -7,7 +7,7 @@ import de.chaffic.math.Mat2
 import de.chaffic.math.Vec2
 import java.time.Instant
 
-private data class Particle(val body: Body, val creationTime: Long = Instant.now().toEpochMilli())
+private data class Particle(val body: Body, val creationTime: Long)
 
 /**
  * Simulates an explosion by creating a number of small, fast-moving particles.
