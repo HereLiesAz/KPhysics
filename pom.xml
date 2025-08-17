@@ -37,13 +37,6 @@
 
     <build>
         <plugins>
-            <!--
-            NOTE: There is an issue with the dokka-maven-plugin.
-            It does not seem to pick up changes in KDoc comments, even after `mvn clean`.
-            The documentation in the `/docs` directory may not be up-to-date with the source code.
-            I have tried various cache-clearing strategies without success.
-            This might be a bug in Dokka or a project-specific configuration issue.
-            -->
             <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
